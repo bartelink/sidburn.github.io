@@ -1,7 +1,7 @@
 (**
 \---  
 layout: page  
-title: FSharp.Formatting FSX example  
+title: FSharp.Formatting example  
 \---
 *)
 
