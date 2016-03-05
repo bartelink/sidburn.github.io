@@ -13,11 +13,10 @@ title: Home
     </h1>
     <span class="post-date">
         {{ post.date | date_to_long_string }}
-        <i class="icon icon-comments"></i>
         <a href="{{ site.baseurl }}{{ post.url }}#disqus_thread">comments</a>
     </span>
 
-    {{ post.excerpt }}
+    {{ post.content | truncatewords: 50 }}
     
     <p>
         <a href="{{ post.url }}">Continue reading ...</a>
