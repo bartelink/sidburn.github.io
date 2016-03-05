@@ -25,13 +25,14 @@
           {% endif %}
           {% endif %}
           {% endfor %}
-          <a class="sidebar-nav-item" href="{{ site.url }}/atom.xml">RSS</a>
+          <a class="sidebar-nav-item{% if page.title == 'Archive' %} active{% endif %}" href="{{ site.baseurl }}/archive">Archive</a>
+          <a class="sidebar-nav-item" href="{{ site.baseurl }}/atom.xml">RSS</a>
       </nav>
       <div>
-          <a href="">
+          <a href="https://github.com/sidburn/sidburn.github.io">
               <img src="{{ site.baseurl }}/public/GitHub-Mark-Light-32px.png" style="display: inline" />
           </a>
-          <a href="">
+          <a href="https://twitter.com/David_Raab">
               <img src="{{ site.baseurl }}/public/Twitter_logo_white_32.png" style="display: inline" />
           </a>
       </div>
