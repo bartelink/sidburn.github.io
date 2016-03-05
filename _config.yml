@@ -9,7 +9,7 @@ permalink:        pretty
 title:            'David Raab'
 tagline:          'Blogging about programming'
 description:      ''
-url:              https://github.com/sidburn/sidburn.github.io
+url:              http://sidburn.github.io
 baseurl:          http://sidburn.github.io
 
 author:
