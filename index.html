@@ -11,12 +11,14 @@ title: Home
         {{ post.title }}
       </a>
     </h1>
-    <span class="post-date">{{ post.date | date_to_string }}</span>
+    <span class="post-date">{{ post.date | date_to_long_string }}</span>
+    <span class="post-date"><a href="{{ post.url }}#disqus_thread">comments</a></span>>
 
-    {{ post.content | truncatewords: 100 }} ...
-    <div>
-        <a href="{{ post.url }}">Continue...</a>
-    </div>
+    {{ post.content | truncatewords: 50 }}
+    
+    <p>
+        <a href="{{ post.url }}">Continue reading ...</a>
+    </p>
   </div>
   {% endfor %}
 </div>

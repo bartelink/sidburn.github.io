@@ -16,7 +16,7 @@ author:
   name:           'David Raab'
   url:            http://sidburn.github.io
 
-paginate:         5
+paginate:         10
 
 github:
   repo:           https://github.com/sidburn/sidburn.github.io
