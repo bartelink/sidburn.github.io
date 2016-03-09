@@ -20,3 +20,6 @@ paginate:         10
 
 github:
   repo:           https://github.com/sidburn/sidburn.github.io
+
+gems:
+  - jekyll-sitemap
