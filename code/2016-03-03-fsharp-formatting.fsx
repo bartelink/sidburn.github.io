@@ -1,7 +1,8 @@
 (**
 \---  
 layout: post  
-title: FSharp.Formatting example  
+title: FSharp.Formatting example
+published: false
 \---
 *)
 
