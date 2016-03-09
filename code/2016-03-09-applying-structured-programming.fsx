@@ -2,6 +2,7 @@
 \---  
 layout: post  
 title: Applying Structured Programming
+date: 2016-03-09 01:00:00
 \---
 *)
 
