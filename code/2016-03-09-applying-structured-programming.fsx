@@ -12,6 +12,8 @@ talked about that basic looping constructs, `fold` and so on are basically just 
 In the sense of readability we should try to eliminate them with more specific ones. In this post
 i go through a *toy example* to show the various ways on how to refactor some code.
 
+## The Toy Example
+
 Recently I had some conversation about code in a game and providing some kind of
 *critical hit-chance* in a game. The typical way on how to achieve that is actually easy. Let's
 assume that every attack of an player has a 16% chance to be critical. We only need to generate
