@@ -11,7 +11,7 @@ type DateTime      = System.DateTime
 type StringBuilder = System.Text.StringBuilder
 
 (**
-I can remember the first time I looked at functional(-first) languages like F#, ML, Haskell and others.
+When I remember the first time I looked at functional(-first) languages like F#, ML, Haskell and others.
 The typical reaction that I had, and I always see from other people is: This is unreadable, it
 must be hard to read, it feels complicated and hard. 
 
@@ -19,7 +19,7 @@ After spending some time in F# I cannot agree to that at all anymore. Often the 
 itself is easier (for example compared to C#), shorter and in my opinion more readable.
 The problem is more over that most functional languages shares a syntax that is completely
 different compared to languages like C, C++, C#, Java, JavaScript and other more mainstream
-languages. Often the problem is more that it is just unfamiliar.
+languages. The problem is more that it is just unfamiliar.
 
 In this post I want you to give a quick overview over the most common and important concepts.
 With this overview it should be easy to understand the most basic part to read 
@@ -31,16 +31,16 @@ For better understanding I will provide some C# to F# code examples.
 
 ### Definition C#
 
-Variables are an important concept, in C# you can define variables in two ways. The first way is with an
-explicit type. You can optional initialize it with a value.
+Variables are an important concept, in C# you can define variables in two ways. First with an
+explicit type. You can optionally initialize it with a value.
 
     [lang=csharp]
     int    num  = 33;
     string name = "Hello";
     Person person;
 
-The second way is to use the `var` keyword. It uses *type-inference* to automatically determine the type
-of a variable. You are also forced to specify a value at definition
+The second way is to use the `var` keyword. It uses *type-inference* to automatically determine the
+type of a variable. You are also forced to specify a value in this way.
 
     [lang=csharp]
     var num    = 33;
@@ -62,12 +62,12 @@ let name   = "Hello"
 let person = Person("foo")
 
 (**
-With this code you already see some difference.
+We already can see some important differences.
 
 1. Semicolons are not needed to end/separate commands.
-2. Creating an object from a class you don't have to specify `new`. `new` is optional.
+2. We don't have to specify `new` to create an object.
 
-If you still want to specify a type explicitly, you can add type annotations. 
+We still can add *type-annotations* if we want.
 *)
 
 let num    : int    = 33
@@ -87,7 +87,7 @@ means you can change a variable at any time you want
     name  += " World!";
     person = new Person("bar");
 
-In C# you otherwise only can mark fields from a class as immutable with the `readonly` keyword.
+In C# you otherwise only can create immutable class fields with the `readonly` keyword.
 You cannot create immutable *local-variables*.
 
 ### (Im)mutability in F#
@@ -102,7 +102,7 @@ let mutable person = Person("foo")
 
 (**
 You change the content of a variable with `<-` instead of `=`. Equal is only used to specify or comparison.
-There doesn't exists operators like `+=`. F# doesn't try to make mutability convenient.
+There is no operator like `+=` in F#. F# doesn't try to make mutability convenient.
 *)
 
 num    <- 66
@@ -133,7 +133,7 @@ We can see once again some important differences.
 1. You also use `let` for the definition of a function
 2. Arguments `x` and `y` will just be separated by spaces instead of `(x, y)`
 3. *Type-inference* also works for functions.
-4. There doesn't exists a `return` keyword. The last `expression` is automatically returned as a value.
+4. There doesn't exists a `return` keyword. The last *expression* is automatically returned as a value.
 
 You also can add explicit *type-annotations*.
 
@@ -172,7 +172,7 @@ functional languages.
 
 Generics in F# are just annotated like normal types. The only difference is that all of them start
 with an apostrophe. Instead of `T`, `TIn`, `TOut` and so on, as often used in C#, in F# they will
-just be letters `'a`, `'b`, `'c` ...
+be just letters `'a`, `'b`, `'c` ...
 
 As stated previously. You also don't need to annotate generics. If you have written a generic function,
 F# will automatically infer a generic type for you. So overall you also could just write.
@@ -187,7 +187,7 @@ public/private fields to save data, and provide methods for working with this da
 
 In a *functional-language* instead we usually define our data-types as separate immutable data.
 We then provide (pure) functions that gets immutable data as input, and generate some new data
-as output. Because working with data is so important a functional language offers more than just
+as output. Because working with data is so important, a functional language offers more than just
 classes to define data-types. Besides classes we can use *tuples*, *records* and 
 *discriminated unions*.
 
@@ -217,7 +217,7 @@ let x,y,z    = position
 (**
 You create Tuples just by separating values with a comma. You can extract a Tuple with
 a `let` definition. This way you can easily create a function that return multiple data
-at once. Tuples don't have to contain the same types.
+at once. Tuples don't must contain the same types.
 *)
 
 let someFunction x = x, x*2
@@ -245,12 +245,12 @@ a `string` and a `Person` in that **exact** order.
 ### Records in F#
 
 Working with tuples is good for intermediate function, for example if you create Pipelines like you
-see them with LINQ in C#. There also good for grouping two or three elements, but as soon you have
+see them with LINQ in C#. They are also good for grouping two or three elements, but as soon you have
 have more elements, they are unhandy to work with. An alternative to this is a Record type. If
 you know JavaScript you can compare them just to an object. Or a hash in Perl. The only difference
 is that they are static typed. So you must define a type beforehand. 
 
-There currently exists a plan to add Records in C# 7.
+Records are planned as a feature in C# 7.
 *)
 
 type Human = {
@@ -282,7 +282,7 @@ This code will produce the output:
     David Rab is currently 33 years old
     David Raab is currently 33 years old
 
-Defining a Record needs explicit type annotations, because there is no way to infer them. Creating
+Defining a Record needs explicit type annotations. Creating
 a Record is pretty easy. You just use the `{ ... }` syntax. This is nearly identical to JavaScript.
 As *functional-languages* prefer *immutability* a Record type itself is also *immutable* by default.
 It also has default equality and comparison implementations.
@@ -323,7 +323,7 @@ printfn "%s was a Warrior with Strength of %d" warrior.Name warrior.Attribute.St
 (**
 ### Discriminated Unions in F#
 
-A Discriminated Union (DU) also doesn't currently exists in C#, but there are plans to add them to C# 7.
+A Discriminated Union (DU) also doesn't currently exists in C#, but they are also planed as a feature for C# 7.
 A DU is important as they provide a *OR* type. When you look at classes, tuples or records all of them are
 basically *AND* types. All of those types group some data-together, but you always have all of them
 at the same time. But what happens if you want to express some kind of *Either A or B*? The closest 
@@ -333,9 +333,9 @@ DU are important, because if a language supports both kinds, we also say that it
 *Algebraic type-system*. Let's assume we have a shopping system, and we want to express that a 
 user can pay with different methods.
 
-1. Cash. No Additional data needed
-2. PayPal. We need the Email Address
-3. CreditCard. We need CreditCard Number
+1. **Cash** -- No additional data needed
+2. **PayPal** -- We need the email address
+3. **CreditCard** -- We need the credit card number
 *)
 
 type Payment =
@@ -363,11 +363,10 @@ The above code will produce an output like
 
 Here `inform` is a function with one argument `payment`. Still note that we don't need any kind of
 *type-annotation*. We use *pattern matching* on payment. Just the fact that we use `Cash`, `PayPal`
-and `CreditCard` it automatically can infer that the argument has to be of type `Payment`.
+and `CreditCard` the F# Compiler can automatically infer that the argument has to be of type `Payment`.
 
 *Pattern matching* is a kind of *switch* statement but more powerful, because it not only matches on
-the different cases, you also can extract the additional values that are carried within each case
-to a variable.
+the different cases, you also can extract the additional values that are carried within each case.
 
 Also note the syntax `inform (PayPal "foo@example.com")` We need the braces here not for invocations.
 We need them for grouping. This is probably one source of confusion for people coming from C-style
@@ -395,8 +394,8 @@ what it stands for. Actually converting such a function call to C# would result 
     [lang=csharp]
     someFunction(new Foo(x), new Bar(z));
 
-The big advantage of Discriminated Unions is that each case can contain Classes, Tuples, Records or 
-other Discriminated Unions as values. It even can contain itself as an Element. In this way you
+The big advantage of Discriminated Unions is that each case can contain objects, tuples, records or 
+other discriminated unions as values. It even can contain itself as an element. In this way you
 can easily build recursive data-structures.
 *)
 
@@ -445,8 +444,8 @@ function to traverse them.
 ### List in F#
 
 The example above already introduced lists. Otherwise a list in F# is different to the C# `List<T>` type. 
-In C# your create a mutable List object and you can directly `Add` items to. In F# on the other hand you
-create Lists just with the syntax `[ ... ]` (Like in JavaScript). Otherwise elements get separated by `;`
+In C# you create a mutable `List<T>` object and you can directly `Add` items to. In F# on the other hand you
+create lists just with the syntax `[ ... ]` (Like in JavaScript). Otherwise elements get separated by `;`
 instead of `,`. This is often a source of confusion, because both styles are allowed but they mean something 
 different.
 
@@ -460,7 +459,7 @@ This is a List of a Tuple `int * int * int * int` and it contains a single eleme
 for creating Tuples!
 
 Additional lists in F# are also immutable. They also provide default implementations of equality, comparison
-and so on. If you want to add elements to a list you have to create a new List. This can be easily done with
+and so on. If you want to add elements to a list you have to create a new list. This can be easily done with
 `::`.
 
     let data    = [1;2;3;4]
@@ -470,16 +469,16 @@ and so on. If you want to add elements to a list you have to create a new List. 
 
     [5;1;2;3;4]
 
-note that `data` is unchanged and is still a four element list. The way how Lists are build (*immutable* 
-and as *linked-list*) means adding and removing from the beginning is an efficient operation.
+note that `data` is unchanged and is still a four element list. The way how lists are build (*immutable* 
+and as *linked-list*) means adding and removing from the beginning is an efficient operation *O(1)*.
 
-There are various functions inside the `List` module otherwise to transform lists itself. With `[|1;2;3|]`
-we also can create *mutable fixed arrays*. There also exists a `Array` Module with nearly the same functions
-as in List.
+There are various functions inside the `List` module to transform lists itself. With `[|1;2;3|]`
+we also can create *mutable fixed-size array*. There also exists a `Array` Module with nearly the same 
+functions as in the `List` module.
 
 ## Composition and Piping 
 
-The last concepts we look at in our introduction is the concept of Composition and Piping. Both
+The last concepts we look at in our introduction is the concept of *Composition* and *Piping*. Both
 are very important in functional languages, as more complex logic is achieved by composing of functions.
 Compose ability is actually pretty easy. Let's assume we have a function that takes an `int` as its input
 and a `string` as its output. In C# we would usually define such a *method interface* in that way.
@@ -494,7 +493,7 @@ just as
 
 This definition means. A function that has an `int` as an input, and will return a `string`. Note that
 we don't specify a function name. Every function itself is actually an interface of its own. Something
-like that also exists in C#. Usually expressed as either `Action` or `Func`. We also could have written.
+like this also exists in C#. Usually expressed as either `Action` or `Func`. We also could have written.
 
     [lang=csharp]
     Func<int,string>
@@ -530,12 +529,12 @@ as its output. Looking at those signatures we now can compose them. Even if we d
 those functions do. We just know that the output of the first function can be directly given
 as the input of the second function. What we can create is actually a new function that
 directly has a `string` as its input. and directly returns as an `int`. This kind of idea
-is what we name *composing*. In F# we have a special operator for this kind of composing 
-the `>>` operator.
+is what we name *composing*. In F# we have a special operator for this kind of composition. 
+The `>>` operator.
 
 But let's work step by step to it. Let's assume we have a `parseInts` function
 that takes a string, splits a string on ',' and parses every number as an `int`
-and returns us a List of the int. for the first function.
+and returns us a List of the int. The siganture would be `string -> int list`.
 
 We then have another function `sumList` that just takes a list of `int` and sums all
 numbers together. We now could use those two functions directly like this
@@ -557,7 +556,7 @@ let sumList (xs: int list) = List.sum xs
 let nums = parseInts "1,2,3,4,5"
 let sum  = sumList nums // 15
 
-(** We also could create a new function that combines these steps into a new function *)
+(** We also could create a new function that combines these two steps into a new function *)
 
 let strToSum stringList =
     let nums = parseInts stringList
@@ -568,12 +567,12 @@ let strToSum stringList =
 We now have a function `strToSum` that goes directly from `string -> int`
 
 But these kind of operation is actually pretty generic. As this kind of composing works for
-any kind. In general we can say. Two functions
+any kind of function with any kind of type. In general we can say. When we have two functions.
 
     'a -> 'b
     'b -> 'c
 
-can always be composed to a new function
+we can compose those two into a new function
 
     'a -> 'c
 
@@ -597,7 +596,9 @@ function. The result of the g function is than returned as a value. We also coul
         let z = g y
         y
 
-if it makes it clearer what is happening.
+if it makes it clearer what is happening. The F# compiler automatically infers that `f` and `g` are functions.
+Just by using it like `f x` or `g y` the compiler knows that `f` and `g` must be
+functions with a single argument.
 
 But what kind of types do we have here? The answer is, they are generic. When we look at the type
 signature that the compiler created for us, it looks some kind of scary first. We have.
@@ -616,12 +617,11 @@ Let's go over it step-by-step
 Just by looking at the types we can examine what the function does. We have `'a` as a value and two
 functions. And we need to return a `'c`. So how do we get a `'c`?
 
-At first the only thing that function can do is pass the `'a` into the `f` function. That will
-return a `'b` value. After we have a `'b` it only can pass that value into the `g` functions.
-Finally that returns a `'c` that the `compose` function can return. So we know.
+At first the only thing that function can do is pass the `x` value (a `'a`) into the `f` function. That will
+return a `'b` value. After we have a `'b` value it only can pass that value into the `g` function.
+Finally this returns a `'c` that the `compose` function then returns.
 
-`compose` first executes `f` with our `x` value, then it executes `g` on that result. What we now also 
-could write is something like this.
+We now could use `compose` like this.
 *)
 
 let sum = compose parseInts sumList "1,2,3,4,5" // 15
@@ -631,7 +631,7 @@ Here we now call `compose` with three arguments. We provide the `parseInts` func
 We then provide the `sumList` function as a the second argument. And our third argument is our `"1,2,3,4,5"`
 string.
 
-The last thing we can do now. F# supports *omitting* arguments from a function. If you *omit* a value, you
+The last thing we can do now. F# supports *omitting* arguments from a function call. If you *omit* a value, you
 get a function back with the remaining arguments. Currently our `compose` function is a three arguments 
 function. So what happens if we just provide the first two functions as arguments? We get a function back
 that is still waiting for the last third argument.
@@ -646,11 +646,7 @@ do is put >> between two functions, and we get a new function back! So what we a
 
     (string -> int list) >> (int list -> int)
 
-and we just get a
-
-    string -> int
-
-back.
+and we just get a `string -> int` back.
 *)
 
 let strToSum = parseInts >> sumList
@@ -659,23 +655,23 @@ let result   = strToSum "1,2,3,4,5"
 (**
 So we can easily create new functions out of smaller functions. This is the essence of *functional programming*.
 We have *immutable data-types* that gets transformed from one type to another. And we compose functions
-together to create new functions. Note that we also could theoretically create such a `compose` function in C#.
-But because of a lack of features this is less practical as it seems. 
+together to create new functions. Note that we also could create such a `compose` function in C#.
+But because of a lack of some features in C#, such a function is less practical as it seems. 
 
     [lang=csharp]
     public static Func<A, C> Compose<A, B, C>(Func<A, B> f, Func<B, C> g) {
         return input => g(f(input));
     }
 
-But it anyway can help to understand what Composition means.
+But it is can help to understand what *composition* means.
 
-The remaining part left is now Piping that is used more often in F#. Piping can be compared with Linux
-Pipes. For example in Linux can do stuff like this.
+The remaining part is now *Piping* that is used more often in F#. Piping can be compared with Linux/Bash
+Pipes. For example in Bash you can do stuff like this.
 
     [lang=console]
     cat file.txt | grep "foo" | sort
 
-It basically means that it prints out the file "file.txt" line by line. The output is passed into `grep "foo"`
+It basically means that it prints out the file *file.txt* line by line. The output is passed into `grep "foo"`
 that only shows the line that contains a `foo`. And that output is finally sorted by `sort`. F# has the operator
 `|>` to provide such a functionality. `|>` just means, pass the value on the left to the function on the right.
 So instead of
