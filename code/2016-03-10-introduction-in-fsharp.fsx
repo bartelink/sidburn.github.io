@@ -607,7 +607,7 @@ signature that the compiler created for us, it looks some kind of scary first. W
 Let's go over it step-by-step
 
 | Argument | Signature | Meaning |
-|----------|:---------:|--------:|
+|:--------:|:---------:|:--------|
 | f | ('a -> 'b) | A function that goes from 'a to 'b |
 | g | ('b -> 'c) | A function that goes from 'b to 'c |
 | x | 'a | A value of type 'a |
