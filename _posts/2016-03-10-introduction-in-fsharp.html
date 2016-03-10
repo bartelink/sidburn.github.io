@@ -657,15 +657,15 @@ return <code>unit</code> (Nothing).</p>
 output. Our second functions takes a <code>int list</code> as its input, and will produce just a <code>int</code>
 as its output. Looking at those signatures we now can compose them. Even if we don't now what
 those functions do. We just know that the output of the first function can be directly given
-as the input of the second function. What we can create is actually a new function that
-directly has a <code>string</code> as its input. and directly returns as an <code>int</code>. This kind of idea
-is what we name <em>composing</em>. In F# we have a special operator for this kind of composition.
-The <code>&gt;&gt;</code> operator.</p>
+as the input of the second function.</p>
+<p>We can directly create a function with a <code>string</code> input returning an <code>int</code>.
+This kind of idea is what we name <em>composing</em>. In F# we have a special operator for this
+kind of composition. The <code>&gt;&gt;</code> operator.</p>
 <p>But let's work step by step to it. Let's assume we have a <code>parseInts</code> function
 that takes a string, splits a string on ',' and parses every number as an <code>int</code>
-and returns us a List of the int. The siganture would be <code>string -&gt; int list</code>.</p>
-<p>We then have another function <code>sumList</code> that just takes a list of <code>int</code> and sums all
-numbers together. We now could use those two functions directly like this</p>
+and returns <code>int list</code>. The signature would be <code>string -&gt; int list</code>.</p>
+<p>We then have another function <code>sumList</code> that just takes a <code>int list</code> and sums all
+numbers together returning an <code>int</code>. We could use those two functions like this:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
@@ -722,7 +722,8 @@ first do is</p>
 </tr>
 </table>
 <p>meaning we will call our <code>f</code> function with the <code>x</code> value. The Result of that is passed to the <code>g</code>
-function. The result of the g function is than returned as a value. We also could have written it</p>
+function. The result of the <code>g</code> function is then returned as a value. We also could have written it
+like this.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -731,11 +732,11 @@ function. The result of the g function is than returned as a value. We also coul
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span class="i">compose</span> <span class="i">f</span> <span class="i">g</span> <span class="i">x</span> <span class="o">=</span>
     <span class="k">let</span> <span class="i">y</span> <span class="o">=</span> <span class="i">f</span> <span class="i">x</span>
     <span class="k">let</span> <span onmouseout="hideTip(event, 'fs110', 293)" onmouseover="showTip(event, 'fs110', 293)" class="i">z</span> <span class="o">=</span> <span class="i">g</span> <span class="i">y</span>
-    <span class="i">y</span>
+    <span onmouseout="hideTip(event, 'fs110', 294)" onmouseover="showTip(event, 'fs110', 294)" class="i">z</span>
 </code></pre></td>
 </tr>
 </table>
-<p>if it makes it clearer what is happening. The F# compiler automatically infers that <code>f</code> and <code>g</code> are functions.
+<p>The F# compiler automatically infers that <code>f</code> and <code>g</code> are functions.
 Just by using it like <code>f x</code> or <code>g y</code> the compiler knows that <code>f</code> and <code>g</code> must be
 functions with a single argument.</p>
 <p>But what kind of types do we have here? The answer is, they are generic. When we look at the type
@@ -787,7 +788,7 @@ Finally this returns a <code>'c</code> that the <code>compose</code> function th
 <p>We now could use <code>compose</code> like this.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs101', 294)" onmouseover="showTip(event, 'fs101', 294)" class="i">sum</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs106', 295)" onmouseover="showTip(event, 'fs106', 295)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs90', 296)" onmouseover="showTip(event, 'fs90', 296)" class="f">parseInts</span> <span onmouseout="hideTip(event, 'fs97', 297)" onmouseover="showTip(event, 'fs97', 297)" class="f">sumList</span> <span class="s">&quot;1,2,3,4,5&quot;</span> <span class="c">// 15</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs101', 295)" onmouseover="showTip(event, 'fs101', 295)" class="i">sum</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs106', 296)" onmouseover="showTip(event, 'fs106', 296)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs90', 297)" onmouseover="showTip(event, 'fs90', 297)" class="f">parseInts</span> <span onmouseout="hideTip(event, 'fs97', 298)" onmouseover="showTip(event, 'fs97', 298)" class="f">sumList</span> <span class="s">&quot;1,2,3,4,5&quot;</span> <span class="c">// 15</span>
 </code></pre></td>
 </tr>
 </table>
@@ -801,8 +802,8 @@ that is still waiting for the last third argument.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs111', 298)" onmouseover="showTip(event, 'fs111', 298)" class="f">strToSum</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs106', 299)" onmouseover="showTip(event, 'fs106', 299)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs90', 300)" onmouseover="showTip(event, 'fs90', 300)" class="f">parseInts</span> <span onmouseout="hideTip(event, 'fs97', 301)" onmouseover="showTip(event, 'fs97', 301)" class="f">sumList</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs112', 302)" onmouseover="showTip(event, 'fs112', 302)" class="i">result</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs111', 303)" onmouseover="showTip(event, 'fs111', 303)" class="f">strToSum</span> <span class="s">&quot;1,2,3,4,5&quot;</span> <span class="c">// 15</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs111', 299)" onmouseover="showTip(event, 'fs111', 299)" class="f">strToSum</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs106', 300)" onmouseover="showTip(event, 'fs106', 300)" class="f">compose</span> <span onmouseout="hideTip(event, 'fs90', 301)" onmouseover="showTip(event, 'fs90', 301)" class="f">parseInts</span> <span onmouseout="hideTip(event, 'fs97', 302)" onmouseover="showTip(event, 'fs97', 302)" class="f">sumList</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs112', 303)" onmouseover="showTip(event, 'fs112', 303)" class="i">result</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs111', 304)" onmouseover="showTip(event, 'fs111', 304)" class="f">strToSum</span> <span class="s">&quot;1,2,3,4,5&quot;</span> <span class="c">// 15</span>
 </code></pre></td>
 </tr>
 </table>
@@ -810,7 +811,7 @@ that is still waiting for the last third argument.</p>
 do is put &gt;&gt; between two functions, and we get a new function back! So what we are doing is</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span onmouseout="hideTip(event, 'fs13', 304)" onmouseover="showTip(event, 'fs13', 304)" class="i">string</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs12', 305)" onmouseover="showTip(event, 'fs12', 305)" class="i">int</span> <span onmouseout="hideTip(event, 'fs67', 306)" onmouseover="showTip(event, 'fs67', 306)" class="i">list</span>) <span class="o">&gt;</span><span class="o">&gt;</span> (<span onmouseout="hideTip(event, 'fs12', 307)" onmouseover="showTip(event, 'fs12', 307)" class="i">int</span> <span onmouseout="hideTip(event, 'fs67', 308)" onmouseover="showTip(event, 'fs67', 308)" class="i">list</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs12', 309)" onmouseover="showTip(event, 'fs12', 309)" class="i">int</span>)
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span onmouseout="hideTip(event, 'fs13', 305)" onmouseover="showTip(event, 'fs13', 305)" class="i">string</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs12', 306)" onmouseover="showTip(event, 'fs12', 306)" class="i">int</span> <span onmouseout="hideTip(event, 'fs67', 307)" onmouseover="showTip(event, 'fs67', 307)" class="i">list</span>) <span class="o">&gt;</span><span class="o">&gt;</span> (<span onmouseout="hideTip(event, 'fs12', 308)" onmouseover="showTip(event, 'fs12', 308)" class="i">int</span> <span onmouseout="hideTip(event, 'fs67', 309)" onmouseover="showTip(event, 'fs67', 309)" class="i">list</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs12', 310)" onmouseover="showTip(event, 'fs12', 310)" class="i">int</span>)
 </code></pre></td>
 </tr>
 </table>
@@ -818,8 +819,8 @@ do is put &gt;&gt; between two functions, and we get a new function back! So wha
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs111', 310)" onmouseover="showTip(event, 'fs111', 310)" class="f">strToSum</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs90', 311)" onmouseover="showTip(event, 'fs90', 311)" class="f">parseInts</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs97', 312)" onmouseover="showTip(event, 'fs97', 312)" class="f">sumList</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs112', 313)" onmouseover="showTip(event, 'fs112', 313)" class="i">result</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs111', 314)" onmouseover="showTip(event, 'fs111', 314)" class="f">strToSum</span> <span class="s">&quot;1,2,3,4,5&quot;</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs111', 311)" onmouseover="showTip(event, 'fs111', 311)" class="f">strToSum</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs90', 312)" onmouseover="showTip(event, 'fs90', 312)" class="f">parseInts</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs97', 313)" onmouseover="showTip(event, 'fs97', 313)" class="f">sumList</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs112', 314)" onmouseover="showTip(event, 'fs112', 314)" class="i">result</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs111', 315)" onmouseover="showTip(event, 'fs111', 315)" class="f">strToSum</span> <span class="s">&quot;1,2,3,4,5&quot;</span>
 </code></pre></td>
 </tr>
 </table>
@@ -848,28 +849,28 @@ that only shows the line that contains a <code>foo</code>. And that output is fi
 So instead of</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs111', 315)" onmouseover="showTip(event, 'fs111', 315)" class="f">strToSum</span> <span class="s">&quot;1,2,3,4,5&quot;</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs111', 316)" onmouseover="showTip(event, 'fs111', 316)" class="f">strToSum</span> <span class="s">&quot;1,2,3,4,5&quot;</span>
 </code></pre></td>
 </tr>
 </table>
 <p>We also could write</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="s">&quot;1,2,3,4,5&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs111', 316)" onmouseover="showTip(event, 'fs111', 316)" class="f">strToSum</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="s">&quot;1,2,3,4,5&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs111', 317)" onmouseover="showTip(event, 'fs111', 317)" class="f">strToSum</span>
 </code></pre></td>
 </tr>
 </table>
 <p>Having this kind of Piping means we also could have written <code>strToSum</code> like this</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs113', 317)" onmouseover="showTip(event, 'fs113', 317)" class="f">strToStum</span> <span onmouseout="hideTip(event, 'fs114', 318)" onmouseover="showTip(event, 'fs114', 318)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs114', 319)" onmouseover="showTip(event, 'fs114', 319)" class="i">x</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs90', 320)" onmouseover="showTip(event, 'fs90', 320)" class="f">parseInts</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs97', 321)" onmouseover="showTip(event, 'fs97', 321)" class="f">sumList</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs113', 318)" onmouseover="showTip(event, 'fs113', 318)" class="f">strToStum</span> <span onmouseout="hideTip(event, 'fs114', 319)" onmouseover="showTip(event, 'fs114', 319)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs114', 320)" onmouseover="showTip(event, 'fs114', 320)" class="i">x</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs90', 321)" onmouseover="showTip(event, 'fs90', 321)" class="f">parseInts</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs97', 322)" onmouseover="showTip(event, 'fs97', 322)" class="f">sumList</span>
 </code></pre></td>
 </tr>
 </table>
 <p>instead of</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs111', 322)" onmouseover="showTip(event, 'fs111', 322)" class="f">strToSum</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs90', 323)" onmouseover="showTip(event, 'fs90', 323)" class="f">parseInts</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs97', 324)" onmouseover="showTip(event, 'fs97', 324)" class="f">sumList</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs111', 323)" onmouseover="showTip(event, 'fs111', 323)" class="f">strToSum</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs90', 324)" onmouseover="showTip(event, 'fs90', 324)" class="f">parseInts</span> <span class="o">&gt;</span><span class="o">&gt;</span> <span onmouseout="hideTip(event, 'fs97', 325)" onmouseover="showTip(event, 'fs97', 325)" class="f">sumList</span>
 </code></pre></td>
 </tr>
 </table>
@@ -886,15 +887,15 @@ passed into the <code>sumList</code> function. This kind of style is often what 
 <span class="l">8: </span>
 <span class="l">9: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs115', 325)" onmouseover="showTip(event, 'fs115', 325)" class="f">numbers</span> <span onmouseout="hideTip(event, 'fs98', 326)" onmouseover="showTip(event, 'fs98', 326)" class="i">xs</span> <span class="o">=</span>
-    <span onmouseout="hideTip(event, 'fs98', 327)" onmouseover="showTip(event, 'fs98', 327)" class="i">xs</span>
-    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 328)" onmouseover="showTip(event, 'fs95', 328)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs116', 329)" onmouseover="showTip(event, 'fs116', 329)" class="f">map</span>    (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 330)" onmouseover="showTip(event, 'fs18', 330)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs18', 331)" onmouseover="showTip(event, 'fs18', 331)" class="i">x</span> <span class="o">+</span> <span class="n">3</span>)     <span class="c">// Add +3 to every element</span>
-    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 332)" onmouseover="showTip(event, 'fs95', 332)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs116', 333)" onmouseover="showTip(event, 'fs116', 333)" class="f">map</span>    (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 334)" onmouseover="showTip(event, 'fs18', 334)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs18', 335)" onmouseover="showTip(event, 'fs18', 335)" class="i">x</span> <span class="o">*</span> <span class="n">2</span>)     <span class="c">// Multiply every element by 2</span>
-    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 336)" onmouseover="showTip(event, 'fs95', 336)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs117', 337)" onmouseover="showTip(event, 'fs117', 337)" class="f">filter</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 338)" onmouseover="showTip(event, 'fs18', 338)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs18', 339)" onmouseover="showTip(event, 'fs18', 339)" class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>) <span class="c">// Only pick even elements</span>
-    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 340)" onmouseover="showTip(event, 'fs95', 340)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs117', 341)" onmouseover="showTip(event, 'fs117', 341)" class="f">filter</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 342)" onmouseover="showTip(event, 'fs18', 342)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs18', 343)" onmouseover="showTip(event, 'fs18', 343)" class="i">x</span> <span class="o">&gt;</span> <span class="n">10</span>)    <span class="c">// Only pick elements greater than 10</span>
-    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 344)" onmouseover="showTip(event, 'fs95', 344)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs118', 345)" onmouseover="showTip(event, 'fs118', 345)" class="f">take</span>   <span class="n">10</span>                   <span class="c">// Only take 10 Elements</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs115', 326)" onmouseover="showTip(event, 'fs115', 326)" class="f">numbers</span> <span onmouseout="hideTip(event, 'fs98', 327)" onmouseover="showTip(event, 'fs98', 327)" class="i">xs</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs98', 328)" onmouseover="showTip(event, 'fs98', 328)" class="i">xs</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 329)" onmouseover="showTip(event, 'fs95', 329)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs116', 330)" onmouseover="showTip(event, 'fs116', 330)" class="f">map</span>    (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 331)" onmouseover="showTip(event, 'fs18', 331)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs18', 332)" onmouseover="showTip(event, 'fs18', 332)" class="i">x</span> <span class="o">+</span> <span class="n">3</span>)     <span class="c">// Add +3 to every element</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 333)" onmouseover="showTip(event, 'fs95', 333)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs116', 334)" onmouseover="showTip(event, 'fs116', 334)" class="f">map</span>    (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 335)" onmouseover="showTip(event, 'fs18', 335)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs18', 336)" onmouseover="showTip(event, 'fs18', 336)" class="i">x</span> <span class="o">*</span> <span class="n">2</span>)     <span class="c">// Multiply every element by 2</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 337)" onmouseover="showTip(event, 'fs95', 337)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs117', 338)" onmouseover="showTip(event, 'fs117', 338)" class="f">filter</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 339)" onmouseover="showTip(event, 'fs18', 339)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs18', 340)" onmouseover="showTip(event, 'fs18', 340)" class="i">x</span> <span class="o">%</span> <span class="n">2</span> <span class="o">=</span> <span class="n">0</span>) <span class="c">// Only pick even elements</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 341)" onmouseover="showTip(event, 'fs95', 341)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs117', 342)" onmouseover="showTip(event, 'fs117', 342)" class="f">filter</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 343)" onmouseover="showTip(event, 'fs18', 343)" class="i">x</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs18', 344)" onmouseover="showTip(event, 'fs18', 344)" class="i">x</span> <span class="o">&gt;</span> <span class="n">10</span>)    <span class="c">// Only pick elements greater than 10</span>
+    <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs95', 345)" onmouseover="showTip(event, 'fs95', 345)" class="t">List</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs118', 346)" onmouseover="showTip(event, 'fs118', 346)" class="f">take</span>   <span class="n">10</span>                   <span class="c">// Only take 10 Elements</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs119', 346)" onmouseover="showTip(event, 'fs119', 346)" class="i">result</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs115', 347)" onmouseover="showTip(event, 'fs115', 347)" class="f">numbers</span> [<span class="n">1..</span><span class="n">100</span>] <span class="c">// [12; 14; 16; 18; 20; 22; 24; 26; 28; 30]</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs119', 347)" onmouseover="showTip(event, 'fs119', 347)" class="i">result</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs115', 348)" onmouseover="showTip(event, 'fs115', 348)" class="f">numbers</span> [<span class="n">1..</span><span class="n">100</span>] <span class="c">// [12; 14; 16; 18; 20; 22; 24; 26; 28; 30]</span>
 </code></pre></td>
 </tr>
 </table>
@@ -1036,7 +1037,7 @@ all of the topics you basically already made a big step in understanding F# in g
 <div class="tip" id="fs107">val f : (&#39;a -&gt; &#39;b)</div>
 <div class="tip" id="fs108">val g : (&#39;b -&gt; &#39;c)</div>
 <div class="tip" id="fs109">val x : &#39;a</div>
-<div class="tip" id="fs110">val z : obj</div>
+<div class="tip" id="fs110">val z : &#39;a</div>
 <div class="tip" id="fs111">val strToSum : (String -&gt; int)<br /><br />Full name: 2016-03-10-introduction-in-fsharp.strToSum</div>
 <div class="tip" id="fs112">val result : int<br /><br />Full name: 2016-03-10-introduction-in-fsharp.result</div>
 <div class="tip" id="fs113">val strToStum : x:String -&gt; int<br /><br />Full name: 2016-03-10-introduction-in-fsharp.strToStum</div>

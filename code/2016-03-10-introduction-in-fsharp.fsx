@@ -527,17 +527,18 @@ So we have a function that has a `string` as it's input, and a `int list` (List 
 output. Our second functions takes a `int list` as its input, and will produce just a `int`
 as its output. Looking at those signatures we now can compose them. Even if we don't now what
 those functions do. We just know that the output of the first function can be directly given
-as the input of the second function. What we can create is actually a new function that
-directly has a `string` as its input. and directly returns as an `int`. This kind of idea
-is what we name *composing*. In F# we have a special operator for this kind of composition. 
-The `>>` operator.
+as the input of the second function. 
+
+We can directly create a function with a `string` input returning an `int`.
+This kind of idea is what we name *composing*. In F# we have a special operator for this
+kind of composition. The `>>` operator.
 
 But let's work step by step to it. Let's assume we have a `parseInts` function
 that takes a string, splits a string on ',' and parses every number as an `int`
-and returns us a List of the int. The siganture would be `string -> int list`.
+and returns `int list`. The signature would be `string -> int list`.
 
-We then have another function `sumList` that just takes a list of `int` and sums all
-numbers together. We now could use those two functions directly like this
+We then have another function `sumList` that just takes a `int list` and sums all
+numbers together returning an `int`. We could use those two functions like this:
 *)
 
 (*** hide ***)
@@ -589,14 +590,15 @@ first do is
     (f x)
 
 meaning we will call our `f` function with the `x` value. The Result of that is passed to the `g`
-function. The result of the g function is than returned as a value. We also could have written it
+function. The result of the `g` function is then returned as a value. We also could have written it
+like this.
 
     let compose f g x =
         let y = f x
         let z = g y
-        y
+        z
 
-if it makes it clearer what is happening. The F# compiler automatically infers that `f` and `g` are functions.
+The F# compiler automatically infers that `f` and `g` are functions.
 Just by using it like `f x` or `g y` the compiler knows that `f` and `g` must be
 functions with a single argument.
 
