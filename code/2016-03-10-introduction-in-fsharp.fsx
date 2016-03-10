@@ -11,26 +11,28 @@ type DateTime      = System.DateTime
 type StringBuilder = System.Text.StringBuilder
 
 (**
-I can remember the first time i looked at functional(-first) languages like F#, ML, Haskell and others.
-The typical reaction that i had, and i always see from other people is: This is unreadable, it
+I can remember the first time I looked at functional(-first) languages like F#, ML, Haskell and others.
+The typical reaction that I had, and I always see from other people is: This is unreadable, it
 must be hard to read, it feels complicated and hard. 
 
-Atfer inventing some time and learning F# i cannot aggree to that at all anymore. Often the syntax
+After spending some time in F# I cannot agree to that at all anymore. Often the syntax
 itself is easier (for example compared to C#), shorter and in my opinion more readable.
 The problem is more over that most functional languages shares a syntax that is completely
-different compared to languages like C, C++, C#, Java, JavaScript and other more mainstream languages.
-In this post i want you to give a quick overview over the most common and important concepts.
-With this overview it should be easy to understand the most basic part to read 
-and udnerstand functional code.
+different compared to languages like C, C++, C#, Java, JavaScript and other more mainstream
+languages. Often the problem is more that it is just unfamiliar.
 
-For better understanding i will provide some C# to F# code examples.
+In this post I want you to give a quick overview over the most common and important concepts.
+With this overview it should be easy to understand the most basic part to read 
+and understand functional code.
+
+For better understanding I will provide some C# to F# code examples.
 
 ## Variables
 
 ### Definition C#
 
 Variables are an important concept, in C# you can define variables in two ways. The first way is with an
-explicit type. You can optionaly initialize it with a value.
+explicit type. You can optional initialize it with a value.
 
     [lang=csharp]
     int    num  = 33;
@@ -38,7 +40,7 @@ explicit type. You can optionaly initialize it with a value.
     Person person;
 
 The second way is to use the `var` keyword. It uses *type-inference* to automatically determine the type
-of a vairable. You are also forced to specify a value at definition
+of a variable. You are also forced to specify a value at definition
 
     [lang=csharp]
     var num    = 33;
@@ -90,7 +92,7 @@ You cannot create immutable *local-variables*.
 
 ### (Im)mutability in F#
 
-In F# on the otherhand, everything is immutable by default. You cannot change a variable by default.
+In F# on the other hand, everything is immutable by default. You cannot change a variable by default.
 If you want to create a mutable variable you have to mark a variable as `mutable`
 *)
 
@@ -126,7 +128,7 @@ In F# you put functions inside modules.
     module MyOperations =
         let add x y = x + y
 
-This once agains some important differences.
+We can see once again some important differences.
 
 1. You also use `let` for the definition of a function
 2. Arguments `x` and `y` will just be separated by spaces instead of `(x, y)`
@@ -153,7 +155,7 @@ just provide the arguments as-is.
 ## Generics
 
 One important concept that you will see more often in F# (compared to C#) is the usage of generics.
-Because *type-inference* also works with functions. F# often automatically genaralize a function
+Because *type-inference* also works with functions. F# often automatically generalize a function
 with generic arguments, instead of specific-types. And overall generics are more important in
 functional languages.
 
@@ -172,14 +174,14 @@ Generics in F# are just annotated like normal types. The only difference is that
 with an apostrophe. Instead of `T`, `TIn`, `TOut` and so on, as often used in C#, in F# they will
 just be letters `'a`, `'b`, `'c` ...
 
-As statet previously. You also don't need to annotate generics. If you have written a generic function,
+As stated previously. You also don't need to annotate generics. If you have written a generic function,
 F# will automatically infer a generic type for you. So overall you also could just write.
 
     let someFunction input = // Some code
 
 ## Data-Types
 
-Other than object-oriented languages the key concept of *functional programing* is a separation
+Other than object-oriented languages the key concept of *functional programming* is a separation
 between *data* and *behaviour*. In *OO* programming we use *classes*. Classes can contain
 public/private fields to save data, and provide methods for working with this data.
 
@@ -192,7 +194,7 @@ classes to define data-types. Besides classes we can use *tuples*, *records* and
 ### Tuples in C#
 
 Tuples are also present in C#. There already exists as a `Tuple` class. But working with them
-is not so convenient as in F#. Anyways let's quickly look at how you use them.
+is not so convenient as in F#. Anyway let's quickly look at how you use them.
 
     [lang=csharp]
     var position = Tuple.Create(3, 4, 5); // The type is: Tuple<int,int,int>
@@ -244,7 +246,7 @@ a `string` and a `Person` in that **exact** order.
 
 Working with tuples is good for intermediate function, for example if you create Pipelines like you
 see them with LINQ in C#. There also good for grouping two or three elements, but as soon you have
-have more elements, they are unandy to work with. An alternative to this is a Record type. If
+have more elements, they are unhandy to work with. An alternative to this is a Record type. If
 you know JavaScript you can compare them just to an object. Or a hash in Perl. The only difference
 is that they are static typed. So you must define a type beforehand. 
 
@@ -295,7 +297,7 @@ you can create hierarchical data-structures.
 
 type Attributes = {
     Strength:     int
-    Dexteriy:     int
+    Dexterity:    int
     Intelligence: int
     Vitality:     int
 }
@@ -310,7 +312,7 @@ let warrior = {
     Attribute = 
     {
         Strength = 1000
-        Dexteriy = 200
+        Dexterity = 200
         Intelligence = 3
         Vitality = 1000
     }
@@ -375,9 +377,9 @@ and the second argument would be `"foo@exmaple.com"`. That would fail because `i
 argument function. We first need to create a value. That is just done with `PayPal "foo@example.com"`
 and we want the result to pass to our function. That is why we need to add braces around our call.
 
-This is compareable to just simple maths. `3 + 4 * 5` would yield in `23`. If we otherwise write 
+This is comparable to just simple maths. `3 + 4 * 5` would yield in `23`. If we otherwise write 
 `(3 + 4) * 5` we would get `35`. Braces are just grouping constructs! This becomes more important 
-if we have something like thise.
+if we have something like these.
 
     someFunction (Foo x) (Bar z)
 
@@ -437,13 +439,13 @@ Running the above code will produce us the following output
     [lang=console]
     <p>Hello<strong>World!</strong><br/>InlineCode of<code>let sum x y = x + y</code><br/><p>This is the end</p></p>
 
-So we can easily create hierachical datastructure, and with Pattern Matching we can easily write recursive
+So we can easily create hierarchical data-structures, and with Pattern Matching we can easily write recursive
 function to traverse them.
 
 ### List in F#
 
 The example above already introduced lists. Otherwise a list in F# is different to the C# `List<T>` type. 
-In C# your create a mutable List object and you can directly `Add` items to. In F# on the otherhand you
+In C# your create a mutable List object and you can directly `Add` items to. In F# on the other hand you
 create Lists just with the syntax `[ ... ]` (Like in JavaScript). Otherwise elements get separated by `;`
 instead of `,`. This is often a source of confusion, because both styles are allowed but they mean something 
 different.
@@ -469,7 +471,7 @@ and so on. If you want to add elements to a list you have to create a new List. 
     [5;1;2;3;4]
 
 note that `data` is unchanged and is still a four element list. The way how Lists are build (*immutable* 
-and as *linked-list*) means adding and removing from the beginning is an efficent operation.
+and as *linked-list*) means adding and removing from the beginning is an efficient operation.
 
 There are various functions inside the `List` module otherwise to transform lists itself. With `[|1;2;3|]`
 we also can create *mutable fixed arrays*. There also exists a `Array` Module with nearly the same functions
@@ -479,7 +481,7 @@ as in List.
 
 The last concepts we look at in our introduction is the concept of Composition and Piping. Both
 are very important in functional languages, as more complex logic is achieved by composing of functions.
-Composability is actually pretty easy. Let's assume we have a function that takes an `int` as its input
+Compose ability is actually pretty easy. Let's assume we have a function that takes an `int` as its input
 and a `string` as its output. In C# we would usually define such a *method interface* in that way.
 
     [lang=csharp]
@@ -598,7 +600,7 @@ function. The result of the g function is than returned as a value. We also coul
 if it makes it clearer what is happening.
 
 But what kind of types do we have here? The answer is, they are generic. When we look at the type
-signature that the compiler created for us, it looks some kind of scarry first. We have.
+signature that the compiler created for us, it looks some kind of scary first. We have.
 
     val compose : f:('a -> 'b) -> g:('b -> 'c) -> x:'a -> 'c
 
@@ -727,7 +729,7 @@ code could also be implemented in this way with C# LINQ feature.
 
 ## Final Note
 
-I covered quite a lot of topics. But i hope that now *functional languages* looks less scary to you. By understanding
+I covered quite a lot of topics. But I hope that now *functional languages* looks less scary to you. By understanding
 all of the topics you basically already made a big step in understanding F# in general.
 
 *)

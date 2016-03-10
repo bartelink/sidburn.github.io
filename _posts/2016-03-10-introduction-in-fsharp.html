@@ -4,21 +4,22 @@ title: Introduction to F#
 date: 2016-03-10 00:00:00
 ---
 
-<p>I can remember the first time i looked at functional(-first) languages like F#, ML, Haskell and others.
-The typical reaction that i had, and i always see from other people is: This is unreadable, it
+<p>I can remember the first time I looked at functional(-first) languages like F#, ML, Haskell and others.
+The typical reaction that I had, and I always see from other people is: This is unreadable, it
 must be hard to read, it feels complicated and hard.</p>
-<p>Atfer inventing some time and learning F# i cannot aggree to that at all anymore. Often the syntax
+<p>After spending some time in F# I cannot agree to that at all anymore. Often the syntax
 itself is easier (for example compared to C#), shorter and in my opinion more readable.
 The problem is more over that most functional languages shares a syntax that is completely
-different compared to languages like C, C++, C#, Java, JavaScript and other more mainstream languages.
-In this post i want you to give a quick overview over the most common and important concepts.
+different compared to languages like C, C++, C#, Java, JavaScript and other more mainstream
+languages. Often the problem is more that it is just unfamiliar.</p>
+<p>In this post I want you to give a quick overview over the most common and important concepts.
 With this overview it should be easy to understand the most basic part to read
-and udnerstand functional code.</p>
-<p>For better understanding i will provide some C# to F# code examples.</p>
+and understand functional code.</p>
+<p>For better understanding I will provide some C# to F# code examples.</p>
 <h2>Variables</h2>
 <h3>Definition C#</h3>
 <p>Variables are an important concept, in C# you can define variables in two ways. The first way is with an
-explicit type. You can optionaly initialize it with a value.</p>
+explicit type. You can optional initialize it with a value.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -28,7 +29,7 @@ explicit type. You can optionaly initialize it with a value.</p>
 Person person;
 </code></pre></td></tr></table>
 <p>The second way is to use the <code>var</code> keyword. It uses <em>type-inference</em> to automatically determine the type
-of a vairable. You are also forced to specify a value at definition</p>
+of a variable. You are also forced to specify a value at definition</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -80,7 +81,7 @@ person <span class="o">=</span> <span class="k">new</span> Person(<span class="s
 <p>In C# you otherwise only can mark fields from a class as immutable with the <code>readonly</code> keyword.
 You cannot create immutable <em>local-variables</em>.</p>
 <h3>(Im)mutability in F#</h3>
-<p>In F# on the otherhand, everything is immutable by default. You cannot change a variable by default.
+<p>In F# on the other hand, everything is immutable by default. You cannot change a variable by default.
 If you want to create a mutable variable you have to mark a variable as <code>mutable</code></p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -129,7 +130,7 @@ There doesn't exists operators like <code>+=</code>. F# doesn't try to make muta
 </code></pre></td>
 </tr>
 </table>
-<p>This once agains some important differences.</p>
+<p>We can see once again some important differences.</p>
 <ol>
 <li>You also use <code>let</code> for the definition of a function</li>
 <li>Arguments <code>x</code> and <code>y</code> will just be separated by spaces instead of <code>(x, y)</code></li>
@@ -161,7 +162,7 @@ There doesn't exists operators like <code>+=</code>. F# doesn't try to make muta
 just provide the arguments as-is.</p>
 <h2>Generics</h2>
 <p>One important concept that you will see more often in F# (compared to C#) is the usage of generics.
-Because <em>type-inference</em> also works with functions. F# often automatically genaralize a function
+Because <em>type-inference</em> also works with functions. F# often automatically generalize a function
 with generic arguments, instead of specific-types. And overall generics are more important in
 functional languages.</p>
 <h3>Generics in C#</h3>
@@ -183,7 +184,7 @@ functional languages.</p>
 <p>Generics in F# are just annotated like normal types. The only difference is that all of them start
 with an apostrophe. Instead of <code>T</code>, <code>TIn</code>, <code>TOut</code> and so on, as often used in C#, in F# they will
 just be letters <code>'a</code>, <code>'b</code>, <code>'c</code> ...</p>
-<p>As statet previously. You also don't need to annotate generics. If you have written a generic function,
+<p>As stated previously. You also don't need to annotate generics. If you have written a generic function,
 F# will automatically infer a generic type for you. So overall you also could just write.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
@@ -192,7 +193,7 @@ F# will automatically infer a generic type for you. So overall you also could ju
 </tr>
 </table>
 <h2>Data-Types</h2>
-<p>Other than object-oriented languages the key concept of <em>functional programing</em> is a separation
+<p>Other than object-oriented languages the key concept of <em>functional programming</em> is a separation
 between <em>data</em> and <em>behaviour</em>. In <em>OO</em> programming we use <em>classes</em>. Classes can contain
 public/private fields to save data, and provide methods for working with this data.</p>
 <p>In a <em>functional-language</em> instead we usually define our data-types as separate immutable data.
@@ -202,7 +203,7 @@ classes to define data-types. Besides classes we can use <em>tuples</em>, <em>re
 <em>discriminated unions</em>.</p>
 <h3>Tuples in C#</h3>
 <p>Tuples are also present in C#. There already exists as a <code>Tuple</code> class. But working with them
-is not so convenient as in F#. Anyways let's quickly look at how you use them.</p>
+is not so convenient as in F#. Anyway let's quickly look at how you use them.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -259,7 +260,7 @@ a <code>string</code> and a <code>Person</code> in that <strong>exact</strong> o
 <h3>Records in F#</h3>
 <p>Working with tuples is good for intermediate function, for example if you create Pipelines like you
 see them with LINQ in C#. There also good for grouping two or three elements, but as soon you have
-have more elements, they are unandy to work with. An alternative to this is a Record type. If
+have more elements, they are unhandy to work with. An alternative to this is a Record type. If
 you know JavaScript you can compare them just to an object. Or a hash in Perl. The only difference
 is that they are static typed. So you must define a type beforehand.</p>
 <p>There currently exists a plan to add Records in C# 7.</p>
@@ -352,7 +353,7 @@ you can create hierarchical data-structures.</p>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs44', 102)" onmouseover="showTip(event, 'fs44', 102)" class="t">Attributes</span> <span class="o">=</span> {
     <span onmouseout="hideTip(event, 'fs45', 103)" onmouseover="showTip(event, 'fs45', 103)" class="i">Strength</span><span class="o">:</span>     <span onmouseout="hideTip(event, 'fs12', 104)" onmouseover="showTip(event, 'fs12', 104)" class="t">int</span>
-    <span onmouseout="hideTip(event, 'fs46', 105)" onmouseover="showTip(event, 'fs46', 105)" class="i">Dexteriy</span><span class="o">:</span>     <span onmouseout="hideTip(event, 'fs12', 106)" onmouseover="showTip(event, 'fs12', 106)" class="t">int</span>
+    <span onmouseout="hideTip(event, 'fs46', 105)" onmouseover="showTip(event, 'fs46', 105)" class="i">Dexterity</span><span class="o">:</span>    <span onmouseout="hideTip(event, 'fs12', 106)" onmouseover="showTip(event, 'fs12', 106)" class="t">int</span>
     <span onmouseout="hideTip(event, 'fs47', 107)" onmouseover="showTip(event, 'fs47', 107)" class="i">Intelligence</span><span class="o">:</span> <span onmouseout="hideTip(event, 'fs12', 108)" onmouseover="showTip(event, 'fs12', 108)" class="t">int</span>
     <span onmouseout="hideTip(event, 'fs48', 109)" onmouseover="showTip(event, 'fs48', 109)" class="i">Vitality</span><span class="o">:</span>     <span onmouseout="hideTip(event, 'fs12', 110)" onmouseover="showTip(event, 'fs12', 110)" class="t">int</span>
 }
@@ -367,7 +368,7 @@ you can create hierarchical data-structures.</p>
     <span class="i">Attribute</span> <span class="o">=</span> 
     {
         <span class="i">Strength</span> <span class="o">=</span> <span class="n">1000</span>
-        <span class="i">Dexteriy</span> <span class="o">=</span> <span class="n">200</span>
+        <span class="i">Dexterity</span> <span class="o">=</span> <span class="n">200</span>
         <span class="i">Intelligence</span> <span class="o">=</span> <span class="n">3</span>
         <span class="i">Vitality</span> <span class="o">=</span> <span class="n">1000</span>
     }
@@ -445,9 +446,9 @@ we would try to invoke the <code>inform</code> function with two arguments. The 
 and the second argument would be <code>"foo@exmaple.com"</code>. That would fail because <code>inform</code> is not a two
 argument function. We first need to create a value. That is just done with <code>PayPal "foo@example.com"</code>
 and we want the result to pass to our function. That is why we need to add braces around our call.</p>
-<p>This is compareable to just simple maths. <code>3 + 4 * 5</code> would yield in <code>23</code>. If we otherwise write
+<p>This is comparable to just simple maths. <code>3 + 4 * 5</code> would yield in <code>23</code>. If we otherwise write
 <code>(3 + 4) * 5</code> we would get <code>35</code>. Braces are just grouping constructs! This becomes more important
-if we have something like thise.</p>
+if we have something like these.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">someFunction</span> (<span class="i">Foo</span> <span class="i">x</span>) (<span class="i">Bar</span> <span class="i">z</span>)
@@ -542,11 +543,11 @@ can easily build recursive data-structures.</p>
 </pre></td>
 <td class="snippet"><pre class="fssnip"><code lang="console">&lt;p&gt;Hello&lt;strong&gt;World!&lt;/strong&gt;&lt;br/&gt;InlineCode of&lt;code&gt;let sum x y = x + y&lt;/code&gt;&lt;br/&gt;&lt;p&gt;This is the end&lt;/p&gt;&lt;/p&gt;
 </code></pre></td></tr></table>
-<p>So we can easily create hierachical datastructure, and with Pattern Matching we can easily write recursive
+<p>So we can easily create hierarchical data-structures, and with Pattern Matching we can easily write recursive
 function to traverse them.</p>
 <h3>List in F#</h3>
 <p>The example above already introduced lists. Otherwise a list in F# is different to the C# <code>List&lt;T&gt;</code> type.
-In C# your create a mutable List object and you can directly <code>Add</code> items to. In F# on the otherhand you
+In C# your create a mutable List object and you can directly <code>Add</code> items to. In F# on the other hand you
 create Lists just with the syntax <code>[ ... ]</code> (Like in JavaScript). Otherwise elements get separated by <code>;</code>
 instead of <code>,</code>. This is often a source of confusion, because both styles are allowed but they mean something
 different.</p>
@@ -584,14 +585,14 @@ and so on. If you want to add elements to a list you have to create a new List. 
 </tr>
 </table>
 <p>note that <code>data</code> is unchanged and is still a four element list. The way how Lists are build (<em>immutable</em>
-and as <em>linked-list</em>) means adding and removing from the beginning is an efficent operation.</p>
+and as <em>linked-list</em>) means adding and removing from the beginning is an efficient operation.</p>
 <p>There are various functions inside the <code>List</code> module otherwise to transform lists itself. With <code>[|1;2;3|]</code>
 we also can create <em>mutable fixed arrays</em>. There also exists a <code>Array</code> Module with nearly the same functions
 as in List.</p>
 <h2>Composition and Piping</h2>
 <p>The last concepts we look at in our introduction is the concept of Composition and Piping. Both
 are very important in functional languages, as more complex logic is achieved by composing of functions.
-Composability is actually pretty easy. Let's assume we have a function that takes an <code>int</code> as its input
+Compose ability is actually pretty easy. Let's assume we have a function that takes an <code>int</code> as its input
 and a <code>string</code> as its output. In C# we would usually define such a <em>method interface</em> in that way.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
@@ -737,7 +738,7 @@ function. The result of the g function is than returned as a value. We also coul
 </table>
 <p>if it makes it clearer what is happening.</p>
 <p>But what kind of types do we have here? The answer is, they are generic. When we look at the type
-signature that the compiler created for us, it looks some kind of scarry first. We have.</p>
+signature that the compiler created for us, it looks some kind of scary first. We have.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">val</span> <span class="i">compose</span> <span class="o">:</span> <span class="i">f</span><span class="o">:</span>(<span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span class="o">&#39;</span><span class="i">b</span>) <span class="k">-&gt;</span> <span class="i">g</span><span class="o">:</span>(<span class="o">&#39;</span><span class="i">b</span> <span class="k">-&gt;</span> <span class="o">&#39;</span><span class="i">c</span>) <span class="k">-&gt;</span> <span class="i">x</span><span class="o">:</span><span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span class="o">&#39;</span><span class="i">c</span>
@@ -929,7 +930,7 @@ code could also be implemented in this way with C# LINQ feature.</p>
 <span class="k">var</span> result <span class="o">=</span> Numbers(Enumerable.Range(<span class="n">1</span>,<span class="n">100</span>));
 </code></pre></td></tr></table>
 <h2>Final Note</h2>
-<p>I covered quite a lot of topics. But i hope that now <em>functional languages</em> looks less scary to you. By understanding
+<p>I covered quite a lot of topics. But I hope that now <em>functional languages</em> looks less scary to you. By understanding
 all of the topics you basically already made a big step in understanding F# in general.</p>
 
 
@@ -976,9 +977,9 @@ all of the topics you basically already made a big step in understanding F# in g
 <div class="tip" id="fs41">property System.DateTime.Year: int</div>
 <div class="tip" id="fs42">val printfn : format:Printf.TextWriterFormat&lt;&#39;T&gt; -&gt; &#39;T<br /><br />Full name: Microsoft.FSharp.Core.ExtraTopLevelOperators.printfn</div>
 <div class="tip" id="fs43">val newMe : Human<br /><br />Full name: 2016-03-10-introduction-in-fsharp.newMe</div>
-<div class="tip" id="fs44">type Attributes =<br />&#160;&#160;{Strength: int;<br />&#160;&#160;&#160;Dexteriy: int;<br />&#160;&#160;&#160;Intelligence: int;<br />&#160;&#160;&#160;Vitality: int;}<br /><br />Full name: 2016-03-10-introduction-in-fsharp.Attributes</div>
+<div class="tip" id="fs44">type Attributes =<br />&#160;&#160;{Strength: int;<br />&#160;&#160;&#160;Dexterity: int;<br />&#160;&#160;&#160;Intelligence: int;<br />&#160;&#160;&#160;Vitality: int;}<br /><br />Full name: 2016-03-10-introduction-in-fsharp.Attributes</div>
 <div class="tip" id="fs45">Attributes.Strength: int</div>
-<div class="tip" id="fs46">Attributes.Dexteriy: int</div>
+<div class="tip" id="fs46">Attributes.Dexterity: int</div>
 <div class="tip" id="fs47">Attributes.Intelligence: int</div>
 <div class="tip" id="fs48">Attributes.Vitality: int</div>
 <div class="tip" id="fs49">type CaharacterSheet =<br />&#160;&#160;{Name: string;<br />&#160;&#160;&#160;Attribute: Attributes;}<br /><br />Full name: 2016-03-10-introduction-in-fsharp.CaharacterSheet</div>
