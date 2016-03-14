@@ -11,15 +11,15 @@ module Main
 (**
 One important concept in functional programming is immutability. But also in
 object-oriented programming immutability and so called *immutable objects* getting
-more attention. The problem that i see especially from object-oriented programmers
-are really bad explanations. A lot of explanation i had see described it like this:
+more attention. The problem that I see especially from object-oriented programmers
+are really bad explanations. A lot of explanation I had see described it like this:
 *Just create a class and make all fields readonly (final or const) and 
 you have an immutable object*.
 
-Explanations like these are **horrible**. Such explanations are so simplified that i 
+Explanations like these are **horrible**. Such explanations are so simplified that I
 would even call them *wrong*. So why are they so horrible? Because they don't really
-explain anything at all. A programmer new to this concept will just immediality 
-think: *Uhm, but i want to change things! I want to add data to an array, i want to 
+explain anything at all. A programmer new to this concept will just immediately
+think: *Uhm, but I want to change things! I want to add data to an array, I want to 
 modify things. I want to do some kind of calculations. I don't want to have static non
 changing things. Immutability sounds not practical at all!*
 
@@ -27,18 +27,18 @@ So let's see what immutability really means.
 
 ## Immutability in a Nutshell
 
-A much more useful explanation is to say that *immutability* is not about *forbiding change*
+A much more useful explanation is to say that *immutability* is not about *forbidding change*
 at all. Instead *immutability* is more on **how** to *handle change*. Immutability
-is not about forbiding some kind of operations. You still can add an element to
+is not about forbidding some kind of operations. You still can add an element to
 an array, the difference is that you just do it differently.
 
 In an mutable world you would directly add your element to an array. In an immutable
 world you create a new array with your added element instead. The key concept is to
-understand that instead of modifing something you create something *new* with your
+understand that instead of modifying something you create something *new* with your
 change applied.
 
 Once you understand it is more about creating *new* things with your changes applied,
-the question that araise is more: *Why should that be better?*
+the question that arise is more: *Why should that be better?*
 
 ## About OO
 
@@ -59,10 +59,10 @@ to create methods instead of providing access to data. This and other things are
 why it is hard to *get* the concept of immutability especially as an OO programmer. We will later
 talk about this problem in more depth. For the moment we will put objects aside.
 
-## Immutablility is about data
+## Immutability is about data
 
 So Immutability really means that data itself cannot be changed. But as stated previously, instead
-of modifiying data itself we call functions that then can return new immutable data. Let's look at
+of modifying data itself we call functions that then can return new immutable data. Let's look at
 some immutable data-structures.
 
 ### `int` is immutable
@@ -120,7 +120,7 @@ like this:
     let data2 = 0 :: data
 
 In the same spirit like `+` we have `::` for adding an element to the top of a list. But instead
-of modifing the list itself, we get a new list back. It is now important to note that now we have
+of modifying the list itself, we get a new list back. It is now important to note that now we have
 two lists. `data` now contains `[1;2;3;4;5]` and `data2` contains `[0;1;2;3;4;5]`.
 
 From the examples so far we actually can see a *pattern*. All of our functions take some arguments.
@@ -231,7 +231,7 @@ let me3 = addLike "Tea" me2
 In this example we call `addLike` with `Dark Chocolate` and `me`. And we get a new `Person` back
 with our change applied. Then we use `addLike` on `me2` to create our final `me3`.
 
-It can feel a little awkward to create a lot of intermedia variables, but we can get rid of them 
+It can feel a little awkward to create a lot of intermediate variables, but we can get rid of them 
 by chaining functions with `|>`. So we also could have written it like this.
 *)
 
@@ -243,8 +243,8 @@ let me2 =
 (**
 Here `me` is *piped-into* `addLike "Dark Chocolate"`. This will result in a new `Person` record
 that then is once again *piped-into* `addLike "Tea"`. In object-oriented programming we could
-achieve something similiar if we have a `Person` class with a method `AddLike` that returns a
-new `Person` object, instead of modifing some `private` fields. in C# this would result into
+achieve something similar if we have a `Person` class with a method `AddLike` that returns a
+new `Person` object, instead of modifying some `private` fields. in C# this would result into
 something like this
 
     [lang=csharp]
@@ -263,7 +263,7 @@ to the same object, and `me` would be changed.
 ## Pure functions
 
 In a *functional-only* language we could probably stop at this point. *Data* and *functions*
-are cleary separated, immutablility is only about *data* that does not change. The big problem
+are clearly separated, immutability is only about *data* that does not change. The big problem
 arises if a language also supports classes. Because a class is about *hiding data* 
 and additionally contains *functions*, it introduces a lot of complexity. To understand
 the reason of this complexity, we first need to talk about *pure* and *impure* functions on
@@ -312,7 +312,7 @@ that the first function call would produce. This also explains better why a `rea
 would be impure. If we call `readFile` and some time later once again, we would assume that it
 returns the new current state of the file. It also could yield an error if the function in the
 mean time was deleted. The point is, we expect that the function can return something
-different everytime we call it.
+different every time we call it.
 
 But this kind of description also eliminates some additional behaviour.
 
@@ -329,7 +329,7 @@ side-effects? The answer is no. That is the reason why Erik Meijer often say:
 *We all love side-effects*. But that doesn't mean we want side-effects happens all
 over our code in every function. If a statement like `3 + 5` could yield `10` that would
 probably drive a lot of people crazy, me too. We want side-effects but we want to somehow
-conrol them. We want to minimize side-effects as much as possible.
+control them. We want to minimize side-effects as much as possible.
 
 So how do we do that? By letting pure functions return immutable data!
 
@@ -349,7 +349,7 @@ again at the above impure functions.
 * A function that prints something to the console takes an immutable string
 * Sending/Serialization of data over network can take an immutable data-structure
 
-At this point, i cannot stress further how important it is to understand that immutability
+At this point, I cannot stress further how important it is to understand that immutability
 is all about data, not about functions or behaviour. We will see later why this is so important!
 
 ### Pure functions with side-effects
@@ -404,7 +404,7 @@ until we look at how `someFunction` is implemented. Lets look at another problem
 
 So what is the problem here? We are actually accessing `value.isValid` when it is `true`
 we enter the code. Once again we have `someFunction` using `value`. But wait, why do we now
-re-check `value.isValid`? It could *probably* be that the programmer in charg was drunk, but
+re-check `value.isValid`? It could *probably* be that the programmer in charge was drunk, but
 wait, can we be sure that the `value.isValid` is still true? In fact, as long as we have
 mutability the answer is *no*.
 
@@ -421,14 +421,14 @@ it whenever it wants to!
 
 So shortly, we cannot know if `value` still contains the same data. It already could have changed
 multiple times. This kind of possibility even raises with *multi-threaded* code. And
-i'm not talking about *thread-safety* or *race-conditions* here. `value` could be thread-safe
+I'm not talking about *thread-safety* or *race-conditions* here. `value` could be thread-safe
 and still changed in the mean time. The thing is, mutability basically makes any kind of code
 hard or nearly completely unpredictable.
 
 The problem is, this kind of problem grows the bigger our program becomes. Multi-threading
-also increase that kind of problems by serveral magnitudes. And this is the overall problem.
+also increase that kind of problems by several magnitudes. And this is the overall problem.
 With more code we anyway face problems of designing and maintaining programs. Mutability
-just can create hard to track errors. It can become insanly hard to reason about some
+just can create hard to track errors. It can become insanely hard to reason about some
 kind of code if at every blink of an eye every value can be changed at any time. Immutability
 overall can make code easier to read and maintain.
 
@@ -444,33 +444,33 @@ Mainly it is performance.
 Some people think that *copying* is the often problem or *memory*, but that isn't true. For example
 let's look at the list example. A lot of people assume that by adding an element to a list a whole
 list itself has to be copied. But that isn't true at all. For example adding an element to the top
-is an *O(1)* operation. It only can be made so efficent *because* of immutability. An immutable list
+is an *O(1)* operation. It only can be made so efficient *because* of immutability. An immutable list
 is really just a data-structure that contains an element and a reference to another list. 
 
-That's why adding/removing from the top is efficent, instead of adding/removing at the end like
-many people knew it from types like `List<T>` in C#. The only reason why you could savely reference
+That's why adding/removing from the top is efficient, instead of adding/removing at the end like
+many people knew it from types like `List<T>` in C#. The only reason why you could safely reference
 another list is because of immutability. With mutable data this wouldn't be possible as
 a list can change. So sharing data with immutable data is very safe. That's also the reason
 why you probably hear often that immutability works better with multi-threaded system. Or
 functional languages have advantages with multi-threaded systems. It is because immutable data
-are prefered and used in such languages.
+are preferred and used in such languages.
 
 But it doesn't change that there sometimes exists a problem where this is still a bottleneck
 or the culprit to performance problems. The problem with immutable-data is that you have to build
-them incrementaly. A List with 1 Million elements is really build just as
+them incrementally. A List with 1 Million elements is really build just as
 
     let x = 1 :: 2 :: 3 :: 4 :: ... :: []
 
-or in other words. a lot of copy and create options. Sure a language or a compiler could have
-some optimiziatins. F# probably have them for lists, but that overall doesn't change that 
+or in other words. a lot of copy and create options. Sure a compiler or a runtime could have
+some optimization. F# probably have them for lists, but that overall doesn't change that 
 immutability can sometimes lead to such problems. That is also the very reason why we have 
 a `StringBuilder`.
 
-Also a `String` is immutable but concatenaiting a lot of strings can create a lot of garbage
+Also a `String` is immutable but concatenating a lot of strings can create a lot of garbage
 throw-away objects. A `StringBuilder` can actually close that bridge. A `StringBuilder` uses
 a mutable string, and once you are done, you can get an immutable `string` back.
 
-Other problems can araise that some problems or algorithms can be hard to implement with
+Other problems can arise that some problems or algorithms can be hard to implement with
 immutability. I just want to point again at what was said for *pure* functions. If you encounter
 such problems you always can convert some kind of data to some kind of mutable data. Do your
 operation, and convert it back to a immutable data-type.
@@ -484,21 +484,21 @@ Finally, we now have every knowledge to talk about immutability in object-orient
 and why it is so damn hard. First, let's reconsider what an object is.
 
 The fundamental thing
-of object-oriented programing is to hide data and instead provide methods that do
-some stuff. We even have rules like *Law-of-demeter* or *Tell don't ask* that express it.
+of object-oriented programming is to hide data and instead provide methods that do
+some stuff. We even have rules like *Law-of-Demeter* or *Tell don't ask* that express it.
 An object is not about asking it form some data, we usually just call a method to
 tell it that it should *do* something.
 
 Or in other words. Objects are just collection of functions. And here starts the problem. We
-actually learned that immutability has nothing todo with functions at all! Immutability is 
-about data not functions! Functions sure can be *pure* or *unpure* but once again, we also 
-learnd that it doesn't matter at all for immutability. In fact we even consider it as good
+actually learned that immutability has nothing to-do with functions at all! Immutability is 
+about data not functions! Functions sure can be *pure* or *impure* but once again, we also 
+learned that it doesn't matter at all for immutability. In fact we even consider it as good
 if we have side-effects that returns immutable data. That is how to solve the problem of
 side-effects. But just having data is usually discouraged in OO. OO has even it's own term
 for it. It is named the *Anemic Domain Model* to express if we have classes that just contains
 data.
 
-So, if object-oriented programing don't try to use data explicitly, if we only have objects
+So, if object-oriented programming don't try to use data explicitly, if we only have objects
 that provides us functions (methods) to call. How on earth can we even talk about
 *immutable objects*? What should that thing even be? Does it even makes sense to talk
 about *immutable objects*? If we only provide methods, doesn't it make more sense to talk
@@ -513,7 +513,7 @@ let random = rng.Next();
 (**
 Do we consider `rng` to be immutable or not? Let's look what we have. Besides the usual
 method inherited from `object` we only have three additional methods. `Next`, `NextDouble` and
-`NextBytes`. `rng` don't have any data or additional properties. We cann call `Next` and
+`NextBytes`. `rng` don't have any data or additional properties. We can call `Next` and
 we get an immutable `int` back. Besides that we cannot see any difference at all that `rng`
 itself changed at all! From the outside it looks like an immutable object!
 
@@ -535,9 +535,9 @@ as immutable or pure by looking at how it behaves, not how it is implemented.
 So, now we are in a dilemma, how do we solve it? One thing we could do is to broaden the view of
 what an immutable object is. So we only consider something as immutable only if it has pure
 functions. As soon as we have one impure function on an object, we have to think that there
-exists a possibility that an private propertie probably could be modified.
+exists a possibility that a private property could be modified.
 
-Let's look at another example that i saw some time ago. Someone provided a class like this
+Let's look at another example that I saw some time ago. Someone provided a class like this
 *)
 
 type MutableSite(url:string) =
@@ -586,8 +586,8 @@ type SiteWithProperty(url:string) =
 (**
 The thing is, he thought he made any improvement just because he eliminated a mutable field,
 but actually that change don't matter at all. Whether you
-have a `Text` field that can change, a `Text` Propertie that changes, or a `Text` method,
-in the end, `Text` always can return something different if you try to acces it. So it
+have a `Text` field that can change, a `Text` property that changes, or a `Text` method,
+in the end, `Text` always can return something different if you try to access it. So it
 improves nothing at all. We don't get any *benefits* at all that we should get
 by imposing immutability.
 
@@ -596,9 +596,9 @@ the combination of functions and data in one container like a class. And there i
 problem. Actually it is just fine to have *impure functions* that return immutable data. But
 how do we do that if we consider *impure functions* on an object as bad?
 
-Actually in functional programing we don't have that problem at all. As every function stands on
+Actually in functional programming we don't have that problem at all. As every function stands on
 its own. Sure we group them in Modules, but it doesn't mean a function is part of some kind
-of structure. We can reason about every function separetely. We can have pure and impure functions.
+of structure. We can reason about every function separately. We can have pure and impure functions.
 And none of those changes the fact that we have immutable data. But in a class you combine
 functions with some kind of data in one container, the result is that we have to view an object
 as mutable as soon as it provides an impure method. The reason is that it behaves exactly
@@ -608,7 +608,7 @@ So how do we create our impure functions in object-oriented programming? As we l
 we just need them to do anything useful. Just eliminating all kind of impure functions
 doesn't help us to solve any problems. The only way out of it is if you write static methods
 for impure functions. In this way you can separate impure functions from pure functions
-and an object could be consideren as pure/immutable as long it only has pure methods.
+and an object could be considered as pure/immutable as long it only has pure methods.
 So let's consider how a good immutable object should look like.
 
 ## How to Design immutable objects
@@ -628,9 +628,9 @@ Let's look at `DateTime` as an example. For example we have `DateTime.Now` or `D
 are impure properties as they always return a different `DateTime` whenever we call it. But once we
 have a `DateTime` object we only have *pure methods* operating on it. All data are accessible
 through getters. All methods are *pure*.
-1. As we learnd at the beginning, immutability is not about forbiding change, so an immutable
+1. As we learned at the beginning, immutability is not about forbidding change, so an immutable
 objects should have a lot of methods that gives us easy ways to create new objects with our needed
-modification. If you don't provide them, it will probably painfull to work with your objects. You
+modification. If you don't provide them, it will probably painful to work with your objects. You
 can look again at `DateTime`. We have rich ways like `Add`, `AddDays`, `AddHours`, `AddMinutes` to 
 create new DateTime objects. All of those methods return a new `DateTime` instead of mutating a field.
 
@@ -646,11 +646,11 @@ So let's reconsider the `Site` class above. How should an immutable `Site` class
             SiteImmutable(url, content, content.Length)
 
 So what we really have is a class with our immutable fields. Our member fields
-cannot be changed later as they are immutable. Our class constructur has to be pure, the
+cannot be changed later as they are immutable. Our class constructor has to be pure, the
 same as all methods. The creation of our immutable object is handled by a *static impure method*
 `let site = SiteImmutable.Download("http://example.org")`
 
-Let's for example consider we later want an `Update` method, so we can refetch the `content` of a
+Let's for example consider we later want an `Update` method, so we can re-fetch the `content` of a
 `site`. Instead of providing an *impure* `Update` method we have to provide an *impure static method*
 that does this for us.
 *)
@@ -679,9 +679,9 @@ let updatedSite = SiteImmutable.Update(site)
 (**
 ## Conclusion
 
-Immutability itself is actually an easy concept. The problem starts when we don't seperate
-data and functions cleary from each other like OO programming does it. To really embrace
-immutability in OOP you have to forget a lot of stuff you are teached that should be good. Create
+Immutability itself is actually an easy concept. The problem starts when we don't separate
+data and functions clearly from each other like OO programming does it. To really embrace
+immutability in OOP you have to forget a lot of stuff you were taught that should be good. Create
 pure data-objects as much as possible. Don't implement *impure* methods on such data-objects.
 Instead create *impure static methods*. Those should be as small as possible with as
 little logic possible. They should return an immutable data-objects as soon as possible.
@@ -693,4 +693,3 @@ is a good example for an mutable object that fixes the performance problems for 
 complex strings. Once you are done you convert a `StringBuilder` instance to an
 immutable `string`.
 *)
-
