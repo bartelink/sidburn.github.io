@@ -15,12 +15,11 @@ title: Home
         {{ post.date | date_to_long_string }}
         <a href="{{ site.baseurl }}{{ post.url }}#disqus_thread">comments</a>
     </span>
-
+    
     {{ post.content | strip_html | truncatewords: 50 }}
     
-    <p>
-        <a href="{{ post.url }}">Continue reading ...</a>
-    </p>
+    <br />
+    <a href="{{ post.url }}">Continue reading ...</a>
   </div>
   {% endfor %}
 </div>
