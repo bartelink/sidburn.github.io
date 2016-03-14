@@ -34,6 +34,11 @@ This site will be permanently updated. Links are not sorted in any particular or
 1. [Programming without objects](http://www.falkoriemenschneider.de/a__2014-09-17__Programming-without-objects.html)
 1. [Object Oriented Programming is an expensive disaster which must end](http://www.smashcompany.com/technology/object-oriented-programming-is-an-expensive-disaster-which-must-end)
 
+## Videos
+
+1. [Simple Made Easy](http://www.infoq.com/presentations/Simple-Made-Easy)
+1. [The Value of Values](http://www.infoq.com/presentations/Value-Values)
+
 ## Other
 
 1. [Teach Yourself Programming in Ten Years](http://www.norvig.com/21-days.html)
