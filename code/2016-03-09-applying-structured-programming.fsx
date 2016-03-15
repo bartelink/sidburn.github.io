@@ -6,6 +6,9 @@ date: 2016-03-09 01:00:00
 \---
 *)
 
+(*** hide ***)
+module Main
+
 (**
 In my previous post about [Structured Programming]({% post_url 2016-03-09-structured-programming %}) I 
 talked about that basic looping constructs, `fold` and so on are basically just still to powerful. 
