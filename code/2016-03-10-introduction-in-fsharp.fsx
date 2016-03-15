@@ -7,6 +7,7 @@ date: 2016-03-10 00:00:00
 *)
 
 (*** hide ***)
+module Main
 type DateTime      = System.DateTime
 type StringBuilder = System.Text.StringBuilder
 
