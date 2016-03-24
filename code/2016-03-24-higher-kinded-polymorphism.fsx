@@ -1,7 +1,7 @@
 (**
 \---  
 layout: post  
-title: Higher-kinded Polymorphism&#58; What is it, why you want it
+title: "Higher-kinded Polymorphism: What is it, why you want it"
 \---
 *)
 
