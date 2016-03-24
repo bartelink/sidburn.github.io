@@ -45,7 +45,7 @@ operation with different types.
 
 ## Higher-kinded polymorphism
 
-Now let's assume we want to write our own function that just adds two `int` together. We could just write
+Now let's assume we want to write a function that just adds two `int` together. We could just write
 
     let add x y = x + y
 
@@ -123,8 +123,8 @@ Let's assume we have the following `Vector3` type.
 (*** define:vector3 ***)
 type Vector3 = {X:float; Y:float; Z:float} with
     static member create x y z = {X=x; Y=y; Z=z}
-    static member (+) (a,b) = Vector3.create (a.X + b.X) (a.Y + b.Y) (a.Z + b.Z)
-    static member Zero = Vector3.create 0.0 0.0 0.0
+    static member (+) (a,b)    = Vector3.create (a.X + b.X) (a.Y + b.Y) (a.Z + b.Z)
+    static member Zero         = Vector3.create 0.0 0.0 0.0
     static member DivideByInt(a,b) = 
         Vector3.create 
             (LanguagePrimitives.DivideByInt a.X b) 
@@ -134,10 +134,11 @@ type Vector3 = {X:float; Y:float; Z:float} with
 (**
     type Vector3 = {X:float; Y:float; Z:float} with
         static member create x y z = {X=x; Y=y; Z=z}
-        static member (+) (a,b) = Vector3.create (a.X + b.X) (a.Y + b.Y) (a.Z + b.Z)
+        static member (+) (a,b)    = Vector3.create (a.X + b.X) (a.Y + b.Y) (a.Z + b.Z)
 
 We now have our own `Vector3` and implemented `+` for it. The big advantage is now, that
-our `Vector3` can also be used with our `add` function.
+our `Vector3` also can be used with our polymorphic `add` function written in F#. But in C#
+you must create a new `Add` function instead, because we cannot convert a `Vector3` to a `float`.
 *)
 
 let vec1 = Vector3.create 1.0 1.0 1.0
@@ -154,7 +155,7 @@ To start, let's create a non-polymorphic `average` function that expects a `floa
 returns the average.
 *)
 
-let averageN xs =
+let averageFloat xs =
     let mutable amount = 0   // The amount of values we have
     let mutable sum    = 0.0 // Zero for `float`
     for x in xs do
@@ -162,7 +163,7 @@ let averageN xs =
         amount <- amount + 1
     sum / (float amount)     // Divide by int for `float`
 
-let x = averageN [1.0 .. 100.0] // 50.5
+let x = averageFloat [1.0 .. 100.0] // 50.5
 
 (**
 Sure, we also could solve it more functional with recursion and immutable state, but this is not
@@ -279,4 +280,7 @@ has `List.average` that is polymorphic in the way I showed here. But overall the
 was not build up with this feature in-mind, and it also don't make it easy to create polymorphic
 functions in that way.
 
+But it is a really important concept, and I think programing languages should try to focus
+more on this kind of polymorphic behaviour. If you are aware of this feature, probably you see the
+chance of creating your own polymorphic functions and you gain a lot more code reuse.
 *)
