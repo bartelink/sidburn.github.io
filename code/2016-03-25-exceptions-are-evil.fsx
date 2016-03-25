@@ -48,17 +48,17 @@ null bad
 
     let result = SomeFunction()
     if result <> null then
-        // Some code with null
+        // Some code if everything was right
     else
-        // Error condition
+        // Error condition on null
 
 and suddenly wrapping your code in a `try/catch` anyhow better?
 
     try
         let result = SomeFunction()
-        // Some code with null
+        // Some code if everything was right
     with
-        | exn -> // Error condition
+        | exn -> // Error condition on Exception
 
 ## 4. We cannot skip the checking
 
@@ -72,7 +72,8 @@ a `NullReferenceException` further up the stack. There is no difference at all h
 
 But overall, this was not meant with *skipping*. The idea of *skipping* was that you can do the null check
 at some later point where it makes sense. That doesn't mean only "further up the stack". The idea is that you
-pass the whole error as a value around, as you can do with `Optional`. 
+pass the whole error as a value around, as you can do with `Optional`, and additional you are forced
+to check the condition of your `Optional` at compile-time.
 
 ## 5. and 6. We can pass functions/objects that throws exception around
 
