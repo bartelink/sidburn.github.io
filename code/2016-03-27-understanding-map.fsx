@@ -259,13 +259,13 @@ can view `map` as a single argument function, or as a two argument functions. Bo
 different meaning. When we interpret `map` as a single argument function, we now have something like
 this
 
-| Input    | Output |
-|:--------:|:------:|
-| 'a -> 'b | list<'a> -> list<'b> |
-| 'a -> 'b | option<'a> -> option<'b> |
-| 'a -> 'b | Result<'a> -> Result<'b> |
-| 'a -> 'b | Result<'a> -> Async<'b> |
-| 'a -> 'b | Result<'a> -> Whatever<'b> |
+| Function | Input    | Output |
+|:--------:|:--------:|:------:|
+| List.map   | 'a -> 'b | list<'a> -> list<'b> |
+| Option.map | 'a -> 'b | option<'a> -> option<'b> |
+| Result.map | 'a -> 'b | Result<'a> -> Result<'b> |
+| Async.map  | 'a -> 'b | Async<'a> -> Async<'b> |
+| Whatever.map | 'a -> 'b | Whatever<'a> -> Whatever<'b> |
 
 It basically means we can think of `map` of some kind of function that can **upgrade** a function.
 If we pass a `int -> string` function for example to `List.map` we get a `list<int> -> list<string>`
@@ -361,7 +361,7 @@ let downloadPage = async {
 }
 
 (**
-What we now have is a `Async<list<option<int>>>`. Puh looks complicated! So what do we now do
+What we now have is a `Async<list<option<int>>>`. Puh looks complicated! So what do we now
 if we want to square the `int` inside our `Async<List<Option<...>>>` construct? We just add
 one layer after another to `square`. At first, we do a `Option.map` on `square`. The result
 of this is a function that we pass to `List.map` that adds the `List` layer. And once again
@@ -384,7 +384,7 @@ let data = Async.RunSynchronously (squaring downloadPage)
 And `data` will be `[Some 2; Some 4; None; Some 6; None; None; Some 20]`
 
 All `Option`, `List` and `Async` handling was handled for us. We just **upgraded**
-`squared` with the different `map` functions until it matches our needed signature.
+`square` with the different `map` functions until it matches our needed signature.
 
 Let's assume we wouldn't have `Async.map`, `List.map`, `Option.map`. We would have needed
 to write it like this.
@@ -429,11 +429,11 @@ The second rule says that composing two functions and then mapping, should be th
 as mapping over both functions separately.
 *)
 
-// 1.Rule: compose two functions, and then map
+// 1 solution: compose two functions, and then map
 let comp = square >> add10
 let cxs  = List.map comp [1;2;3;4;5]
 
-// 2.Rule: mapping it two times
+// 2 solution: mapping it two times
 let sxs =
     [1;2;3;4;5]
     |> List.map square
@@ -449,12 +449,13 @@ Because `List.map` satisfies both laws, we say that `List` is a *functor*.
 ## Summary
 
 I hope it is now clear why `map` is such an important function. Implementing a `map` function
-just means you can **upgrade** an already available function. It means you get a lot
-of functions for free that can operate with your type, without the need to rewrite them.
+just means you can **upgrade** already available functions. It opens up a lot of
+code reuse as you don't have to write special glue code that handles your type/layer.
 
 It also can make writing new functions easier, as you don't have to care about a layer.
-If you find yourself writing a function that loops through a list, just to apply a function,
-then *probably* you are doing something wrong! Not only is it easier to just write a function that
-don't contain any list/looping/recursion logic. Such a function is even more reusable.
+If you find yourself writing a function that has a list as its input and a list as its output
+then you are *probably* doing something wrong! The same goes for every other type.
 
+Not only is it easier to just write a function that don't contain any list/looping/recursion
+logic. Such a function is even more reusable.
 *)
