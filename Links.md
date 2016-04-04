@@ -36,6 +36,7 @@ This site will be permanently updated. Links are not sorted in any particular or
 
 ## Videos
 
+1. [Why Functional Programming Matters](https://www.youtube.com/watch?v=Z35Tt87pIpg)
 1. [Simple Made Easy](http://www.infoq.com/presentations/Simple-Made-Easy)
 1. [The Value of Values](http://www.infoq.com/presentations/Value-Values)
 
