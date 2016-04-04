@@ -3,18 +3,17 @@ layout: post
 title: "Understanding bind"
 ---
 
-<p>In <a href="{% post_url 2016-03-27-understanding-map %}">Understanding map</a> we learned about the "map"
-function and that implementing those is what we call a <em>Functor</em>. In
-<a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a> we extended that idea
-with the <code>return</code> and <code>apply</code> function. The next important function in our toolset is
+<p>In <a href="{% post_url 2016-03-27-understanding-map %}">Understanding map</a> we learned that implementing
+a <code>map</code> function is what we call a <em>Functor</em>. In <a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a>
+we extended that idea with the <code>return</code> and <code>apply</code> function. The next important function in our toolset is
 the <code>bind</code> function.</p>
 <h2>Monads</h2>
 <p>The combination of <code>return</code> and <code>bind</code> is what we call a Monad. But currently
-i will not consider this as an introduction to Monads at all. If you heard the <em>Monad</em> term and
+I will not consider this as an introduction to Monads at all. If you heard the <em>Monad</em> term and
 search for an introduction to understand what a <em>Monad</em> is you will not find an answer her. If
 you already have some basic understanding about the term than this and my two previous blogs
 can help to understand the concept. Otherwise if you just try to understand what a <em>Monad</em> is
-i recommend the following link to understand the problem:
+I recommend the following link to understand the problem:
 <a href="http://two-wrongs.com/the-what-are-monads-fallacy">The what are Monads Fallacy</a></p>
 <h2>The Problem</h2>
 <p>I think it is always good to start with a problem. If we understand a problem first, we usually
@@ -22,12 +21,11 @@ have it easier to understand why we are doing something. Currently we have <code
 one argument, with <code>return</code> and <code>apply</code> we could upgrade functions with multiple arguments. So
 what is <code>bind</code> supposed to do?</p>
 <p>Up to this point we only upgraded functions that had normal unboxed input and output types. We always
-faced functions like <code>int -&gt; int</code>, but never functions like <code>int -&gt; option&lt;int&gt;</code>, <code>int -&gt; Async&lt;int&gt;</code>
-or <code>int -&gt; list&lt;int&gt;</code>. But in practice, functions that take some normal input, and produces
-a <code>option</code>, <code>list</code> or <code>Async</code> are quite common.</p>
-<p>A simple example to demonstrate this is just parsing the input (string) to a <code>float</code>. Because parsing
-could fail (string is not a <code>float</code>) it will return an <code>option&lt;float&gt;</code> instead. Usually we create a
-<code>Double</code> extension for this.</p>
+faced functions like <code>'a -&gt; 'b</code>, but never functions like <code>'a -&gt; option&lt;'b&gt;</code>, <code>'a -&gt; Async&lt;'b&gt;</code>
+or <code>'a -&gt; list&lt;'b&gt;</code>. But in practice, the latter are quite common.</p>
+<p>A simple example is a function that tries to parse a <code>string</code> to a <code>float</code>. Because parsing of
+a string to a float could fail we usually expect a return type like <code>option&lt;float&gt;</code>. Usually we
+create a <code>Double</code> extension for this.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -60,17 +58,17 @@ and so on.</p>
 let's assume we have a <code>option&lt;string&gt;</code>, and now we want to pass this value to <code>Double.tryParse</code>.
 As <code>tryParse</code> only expects <code>string</code> we could <code>Option.map</code> <code>tryParse</code> so it could work with
 a <code>option&lt;string&gt;</code>.</p>
-<p>But <code>map</code> not only adds a <code>option</code> <em>layer</em> to the input, it also adds it to the output. Now
-we have a function with the signature.</p>
+<p>But <code>map</code> not only adds a <code>option</code> <em>layer</em> to the input, it also adds it to the output. When we
+use <code>Option.map</code> on our <code>Double.tryParse</code> function, we get a function that looks like this:</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs11', 16)" onmouseover="showTip(event, 'fs11', 16)" class="i">option</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs10', 17)" onmouseover="showTip(event, 'fs10', 17)" class="i">string</span><span class="o">&gt;</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 18)" onmouseover="showTip(event, 'fs11', 18)" class="i">option</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs11', 19)" onmouseover="showTip(event, 'fs11', 19)" class="i">option</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs12', 20)" onmouseover="showTip(event, 'fs12', 20)" class="i">float</span><span class="o">&gt;</span><span class="o">&gt;</span>
 </code></pre></td>
 </tr>
 </table>
-<p>So we have the problem that our <em>output</em> is wrapped two times in the same layer. Now we have a
+<p>The problem is that our <em>output</em> is wrapped two times in the same layer. Now we have a
 <em>option containing an option containing a float</em>. But what we really want is just an <code>option&lt;float&gt;</code>.
-And here comes <code>bind</code> into the play. The purpose of <code>bind</code> is to only <em>upgrade</em> the input of a
+This is where <code>bind</code> comes into the play. The purpose of <code>bind</code> is to only <em>upgrade</em> the input of a
 function because the output of a function already returns an upgraded type. A <code>bind</code> function thus
 always have the <em>type-signature</em></p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -85,7 +83,7 @@ always have the <em>type-signature</em></p>
 </table>
 <h2><code>return</code> once again</h2>
 <p>The <code>bind</code> function don't stands on it's own. We also need a <code>return</code> function. But we
-already covered this function in <a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a></p>
+already covered this function in <a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a>.</p>
 <h2>Implementing <code>bind</code></h2>
 <p>We can implement <code>bind</code> in two different ways. It is good to know both as depending on which type we
 have, sometimes the one or the other can be easier.</p>
@@ -132,8 +130,8 @@ implementation side-by-side.</p>
 of <code>Some (f x)</code>. We don't need to wrap the output in a <code>Some</code> because our function <code>f</code> already returns
 an <code>option</code>. So we just return it's output directly.</p>
 <h3>The <code>join</code> way</h3>
-<p>In the second way we first create a new function that can turn a <code>option&lt;option&lt;'a&gt;&gt;</code> just into a
-<code>option&lt;'a&gt;</code>. That's also quite easy. We first check our first outer-most <code>option</code>. If it is <code>None</code>
+<p>The other way is to first implement a new function that can turn a <code>option&lt;option&lt;'a&gt;&gt;</code> just into a
+<code>option&lt;'a&gt;</code>. That's also quite easy. We first check our outer-most <code>option</code>. If it is <code>None</code>
 we just return <code>None</code>. In the <code>Some</code> case we have another option that we directly return.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
@@ -168,7 +166,7 @@ we just return <code>None</code>. In the <code>Some</code> case we have another 
 </table>
 <p>As we can see from the signature. <code>input1</code> and <code>input2</code> are just <code>option&lt;float&gt;</code>
 instead of <code>option&lt;option&lt;float&gt;&gt;</code> that a <code>map</code> will return us.</p>
-<p>Sure, the <code>Option</code> module already contains <code>Option.map</code> and <code>Option.bind</code>, so we don't have to
+<p>The <code>Option</code> module already contains <code>Option.map</code> and <code>Option.bind</code>, so we don't have to
 rewrite those ourselves. As another exercise, let's look at a <code>bind</code> implementation for <code>list</code>.</p>
 <h2><code>bind</code> for <code>list</code></h2>
 <p>Creating a <code>bind</code> for a <code>list</code> is a case where the first-approach is usually really hard. Let's look
@@ -188,13 +186,17 @@ at a <code>map</code> implementation for <code>list</code> first.</p>
 <p><code>Option.bind</code> was really easy as we could directly return what the call to <code>f</code> returned. But for a list
 this is not possible. Because in a list we call <code>f</code> multiple times for the input list, and the output
 of those are collected into a new list.</p>
-<p>because we think of <code>f</code> as a <em>Monadic function</em>. It means <code>f</code> returns a <code>list</code>. So what we overall get
-back is a list of list <code>list&lt;list&lt;'a&gt;&gt;</code>. Solving that problem inside of <code>bind</code> is hard, because <code>list</code>
-is an <em>immutable</em> data-structure. With a <em>mutable</em> list (<code>ResizeArray</code>) this operation would be quite
-easy, as we just could call <code>f x</code> that returns a <code>list</code> and loop through it and add it to some other list
-at the end that accumulates all. If you really want to solve it in <code>bind</code> in one-go that is
-even what i would. Otherwise you have to use two nested <code>fold</code> or <code>foldBack</code> calls. So instead of
-nesting them. It is usually better to extract those operation into it's own function. So we create
+<p>Because <code>f</code> is a <em>Monadic function</em> in <code>bind</code> it means every call to <code>f</code> will return a list. If
+we add a list to another list, we get a list of list as expected <code>list&lt;list&lt;'a&gt;&gt;</code>. If we try to
+return a single <code>list</code> instead, it means we have to loop over the result of <code>f</code> and add its element
+to another list.</p>
+<p>Solving that problem inside of <code>bind</code> is hard, because <code>list</code> is an <em>immutable</em> data-structure. With a
+<em>mutable</em> list (<code>ResizeArray</code>) this operation would be quite easy, as we just could call <code>f x</code> that
+returns a <code>list</code> and loop through it and add it to some other list, but with an <em>immutable</em> list we
+cannot just add elements to an existing element.</p>
+<p>When we really want to solve it in one-go we could use a mutable list like <code>ResizeArray</code>, otherwise
+we have to use two nested <code>fold</code> or <code>foldBack</code> calls. Instead of nesting it and turning it in a complex
+function it is usually better to just extract those operation into it's own function. So we create
 a <code>concat</code> operation first, that can turn a <code>list&lt;list&lt;'a&gt;&gt;</code> just into a single list.</p>
 <p>I'm not showing how to implementing <code>concat</code> for <code>list</code>, as the focus is <code>bind</code> not how immutable list
 processing works. So for <code>list</code> we usually would prefer just a <code>map</code> and <code>concat</code> implementation for
@@ -210,7 +212,7 @@ for every input of our starting list, but we still get a single list, not a list
 <p>F# also provides an implementation for this function. But it is named <code>List.collect</code> instead of <code>List.bind</code>.</p>
 <h2>An operator for <code>bind</code></h2>
 <p>In <a href="{% post_url 2016-03-31-applicative-functors %}">Applicative Functors</a> we used <code>&lt;!&gt;</code> for the <code>map</code> function.
-And <code>&lt;*&gt;</code> for the <code>apply</code> function. We use <code>&gt;&gt;=</code> as an operator for the <code>bind</code> operation. But on top of it.
+And <code>&lt;*&gt;</code> for the <code>apply</code> function. We use <code>&gt;&gt;=</code> as an operator for the <code>bind</code> function. But on top of it.
 If we write it as an operator we swap the arguments. We expects our type <code>option</code>, <code>list</code>, <code>async</code> on the
 left-side and the function on the right-side.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -230,34 +232,48 @@ and <code>apply</code> by the idea to just pass in the first argument. So when w
 </code></pre></td>
 </tr>
 </table>
-<p>we see it as a function that just <em>upgrades</em> the input function. But sure, we still have a two argument
-function here, and the two argument form is really how it is most often used. If we threat it as
+<p>we see it as a function that just <em>upgrades</em> the input of a function. But we still have a two argument
+function here, and the two argument form is how <code>bind</code> is used most often. If we threat it as
 a two-argument function we have something like this:</p>
 <p>We have a <code>option&lt;'a&gt;</code> as an input. And we provide a function <code>'a -&gt; option&lt;'b&gt;</code>. As we can see, the input
-of <code>f</code> is just <code>'a</code>. So what we get as the input is the <strong>unwrapped</strong> <code>'a</code> that is inside <code>option&lt;'a&gt;</code>.
-So we can provide a function <code>f</code> that only will be executed when our <code>option&lt;'a&gt;</code> is <code>Some value</code>.</p>
-<p>Look again at the implementation of <code>bind</code> to understand this. <code>bind</code> checks whether we have <code>None</code> or <code>Some</code>.
-In the <code>None</code> case it will just return <code>None</code> but in the <code>Some</code> case it will do <code>f x</code>. So only in the <code>Some</code>
-case our passed in function <code>f</code> will be executed! Not only that, the <em>unwrapping</em> of the <code>option</code>
-is already handled for us by the <code>bind</code> function. So we can pass a function <code>f</code> to bind that only will
-be executed if we have <code>Some value</code>.</p>
-<p>To understand this idea in more depth. Let's first create a function that prints some text to screen.
-And we expect that the user enters some number. We parse the input as <code>float</code> with our
-<code>Double.tryParse</code> function. This returns an <code>option&lt;float&gt;</code></p>
+of <code>f</code> is just <code>'a</code>. So what we get as the input is the <strong>unwrapped</strong> <code>'a</code> that is inside <code>option&lt;'a&gt;</code>.</p>
+<p>It can help here if we think with piping <code>|&gt;</code>. The idea of piping is that we can write the next argument
+of a function on the left side. So instead of <code>f x</code> we also can write <code>x |&gt; f</code>. When we use <code>bind</code> with
+piping we have something like <code>x |&gt; Option.bind f</code>. We also can rearange the <em>type-signature</em> to reflect
+this style of writing</p>
+<table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
+</pre></td>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs11', 112)" onmouseover="showTip(event, 'fs11', 112)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">a</span><span class="o">&gt;</span> <span class="k">-&gt;</span> (<span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 113)" onmouseover="showTip(event, 'fs11', 113)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">b</span><span class="o">&gt;</span>) <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 114)" onmouseover="showTip(event, 'fs11', 114)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">b</span><span class="o">&gt;</span>
+</code></pre></td>
+</tr>
+</table>
+<p>When we use piping with bind, we get something similar to the above. And probably the order becomes
+clearer. We start with a boxed value like <code>option&lt;'a&gt;</code>, then our <code>bind</code> function somehow extract the
+<code>'a</code> from our <code>option&lt;'a&gt;</code>, this <code>'a</code> is then passed to the function <code>('a -&gt; option&lt;'b&gt;)</code>. This function
+returns an <code>option&lt;'b&gt;</code> what is also what <code>bind</code> will then return!</p>
+<p>But it is important to understand that there is no guarantee that our function will be called at all!
+Look again at the implementation of <code>bind</code> to understand this. <code>bind</code> checks whether we have <code>None</code> or <code>Some</code>.
+In the <code>None</code> case it will just return <code>None</code> only in the <code>Some</code> case it will call <code>f x</code> and execute
+our function that we passed to <code>bind</code>!</p>
+<p>Not only that, the <em>unwrapping</em> of the <code>option</code> is already handled for us by the <code>bind</code> function. So we
+can pass a function <code>f</code> to <code>bind</code> that only will be executed if we have <code>Some value</code>.</p>
+<p>Let's create an example to understand this idea in more depth. At first we create a function that
+prints some text to screen and expect the user to enter a float. We try to parse the input as
+<code>float</code> with our <code>Double.tryParse</code> function that returns an <code>option&lt;float&gt;</code>.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs43', 112)" onmouseover="showTip(event, 'fs43', 112)" class="f">getUserInput</span> <span onmouseout="hideTip(event, 'fs44', 113)" onmouseover="showTip(event, 'fs44', 113)" class="i">msg</span> <span class="o">=</span>
-    <span onmouseout="hideTip(event, 'fs45', 114)" onmouseover="showTip(event, 'fs45', 114)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%s</span><span class="s">: &quot;</span> <span onmouseout="hideTip(event, 'fs44', 115)" onmouseover="showTip(event, 'fs44', 115)" class="i">msg</span>
-    <span onmouseout="hideTip(event, 'fs46', 116)" onmouseover="showTip(event, 'fs46', 116)" class="t">Console</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs47', 117)" onmouseover="showTip(event, 'fs47', 117)" class="f">ReadLine</span>() <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs3', 118)" onmouseover="showTip(event, 'fs3', 118)" class="t">Double</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 119)" onmouseover="showTip(event, 'fs26', 119)" class="f">tryParse</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs43', 115)" onmouseover="showTip(event, 'fs43', 115)" class="f">getUserInput</span> <span onmouseout="hideTip(event, 'fs44', 116)" onmouseover="showTip(event, 'fs44', 116)" class="i">msg</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs45', 117)" onmouseover="showTip(event, 'fs45', 117)" class="f">printfn</span> <span class="s">&quot;</span><span class="pf">%s</span><span class="s">: &quot;</span> <span onmouseout="hideTip(event, 'fs44', 118)" onmouseover="showTip(event, 'fs44', 118)" class="i">msg</span>
+    <span onmouseout="hideTip(event, 'fs46', 119)" onmouseover="showTip(event, 'fs46', 119)" class="t">Console</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs47', 120)" onmouseover="showTip(event, 'fs47', 120)" class="f">ReadLine</span>() <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs3', 121)" onmouseover="showTip(event, 'fs3', 121)" class="t">Double</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 122)" onmouseover="showTip(event, 'fs26', 122)" class="f">tryParse</span>
 </code></pre></td>
 </tr>
 </table>
 <p>Now we sure could write</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs48', 120)" onmouseover="showTip(event, 'fs48', 120)" class="i">someInput</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 121)" onmouseover="showTip(event, 'fs43', 121)" class="f">getUserInput</span> <span class="s">&quot;Enter a number&quot;</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs48', 123)" onmouseover="showTip(event, 'fs48', 123)" class="i">someInput</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 124)" onmouseover="showTip(event, 'fs43', 124)" class="f">getUserInput</span> <span class="s">&quot;Enter a number&quot;</span>
 </code></pre></td>
 </tr>
 </table>
@@ -265,10 +281,10 @@ And we expect that the user enters some number. We parse the input as <code>floa
 functions. We just could <code>map</code> or <code>apply</code> all other functions that are not compatible with <code>option</code>.</p>
 <p>But instead of doing that, let's pass the resulting <code>option&lt;float&gt;</code> directly to <code>bind</code>. We then
 provide a continuation function to <code>bind</code> that only will be executed if we have <code>Some value</code>.
-The advantage is that our <code>f</code> function now only sees a <code>float</code>, not a <code>option&lt;float&gt;</code>. We now
-can do with that <code>float</code> whatever we want. Let's for example assume we want to fetch the User
-input, and we see that number as the radius of a circle, and we want to calculate the are of that
-circle.</p>
+The advantage is that our <code>f</code> function only sees a <code>float</code>, not a <code>option&lt;float&gt;</code>. We now
+can do something with that <code>float</code>.</p>
+<p>Let's write an example where the user inputs the radius of a circle, and we calculate the
+area of that circle.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
@@ -278,13 +294,13 @@ circle.</p>
 <span class="l">7: </span>
 <span class="l">8: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs49', 122)" onmouseover="showTip(event, 'fs49', 122)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs18', 123)" onmouseover="showTip(event, 'fs18', 123)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 124)" onmouseover="showTip(event, 'fs9', 124)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs18', 125)" onmouseover="showTip(event, 'fs18', 125)" class="i">x</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs50', 126)" onmouseover="showTip(event, 'fs50', 126)" class="f">circleArea</span> <span onmouseout="hideTip(event, 'fs51', 127)" onmouseover="showTip(event, 'fs51', 127)" class="i">r</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs51', 128)" onmouseover="showTip(event, 'fs51', 128)" class="i">r</span> <span class="o">**</span> <span class="n">2.0</span>) <span class="o">*</span> <span onmouseout="hideTip(event, 'fs52', 129)" onmouseover="showTip(event, 'fs52', 129)" class="t">Math</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs53', 130)" onmouseover="showTip(event, 'fs53', 130)" class="i">PI</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs49', 125)" onmouseover="showTip(event, 'fs49', 125)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs18', 126)" onmouseover="showTip(event, 'fs18', 126)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 127)" onmouseover="showTip(event, 'fs9', 127)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs18', 128)" onmouseover="showTip(event, 'fs18', 128)" class="i">x</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs50', 129)" onmouseover="showTip(event, 'fs50', 129)" class="f">circleArea</span> <span onmouseout="hideTip(event, 'fs51', 130)" onmouseover="showTip(event, 'fs51', 130)" class="i">r</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs51', 131)" onmouseover="showTip(event, 'fs51', 131)" class="i">r</span> <span class="o">**</span> <span class="n">2.0</span>) <span class="o">*</span> <span onmouseout="hideTip(event, 'fs52', 132)" onmouseover="showTip(event, 'fs52', 132)" class="t">Math</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs53', 133)" onmouseover="showTip(event, 'fs53', 133)" class="i">PI</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs54', 131)" onmouseover="showTip(event, 'fs54', 131)" class="i">area</span> <span class="o">=</span>
-    <span onmouseout="hideTip(event, 'fs43', 132)" onmouseover="showTip(event, 'fs43', 132)" class="f">getUserInput</span> <span class="s">&quot;Enter radius&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs41', 133)" onmouseover="showTip(event, 'fs41', 133)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 134)" onmouseover="showTip(event, 'fs42', 134)" class="f">bind</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs55', 135)" onmouseover="showTip(event, 'fs55', 135)" class="i">userInput</span> <span class="k">-&gt;</span>
-        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs56', 136)" onmouseover="showTip(event, 'fs56', 136)" class="i">area</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs50', 137)" onmouseover="showTip(event, 'fs50', 137)" class="f">circleArea</span> <span onmouseout="hideTip(event, 'fs55', 138)" onmouseover="showTip(event, 'fs55', 138)" class="i">userInput</span>
-        <span onmouseout="hideTip(event, 'fs49', 139)" onmouseover="showTip(event, 'fs49', 139)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs56', 140)" onmouseover="showTip(event, 'fs56', 140)" class="i">area</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs54', 134)" onmouseover="showTip(event, 'fs54', 134)" class="i">area</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs43', 135)" onmouseover="showTip(event, 'fs43', 135)" class="f">getUserInput</span> <span class="s">&quot;Enter radius&quot;</span> <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs41', 136)" onmouseover="showTip(event, 'fs41', 136)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 137)" onmouseover="showTip(event, 'fs42', 137)" class="f">bind</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs55', 138)" onmouseover="showTip(event, 'fs55', 138)" class="i">userInput</span> <span class="k">-&gt;</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs56', 139)" onmouseover="showTip(event, 'fs56', 139)" class="i">area</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs50', 140)" onmouseover="showTip(event, 'fs50', 140)" class="f">circleArea</span> <span onmouseout="hideTip(event, 'fs55', 141)" onmouseover="showTip(event, 'fs55', 141)" class="i">userInput</span>
+        <span onmouseout="hideTip(event, 'fs49', 142)" onmouseover="showTip(event, 'fs49', 142)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs56', 143)" onmouseover="showTip(event, 'fs56', 143)" class="i">area</span>
     )
 </code></pre></td>
 </tr>
@@ -292,8 +308,9 @@ circle.</p>
 <p>Let's go through the example step-by-step.</p>
 <ol>
 <li>
-At first we just create a function <code>circleArea</code> that does are computation. We just expect <code>float</code>
-as it's input. Sure we usually don't want to handle <code>option&lt;float&gt;</code>, <code>list&lt;float&gt;</code> and so on.
+At first we just create a function <code>circleArea</code> that calculates the area from a given radius.
+For such a function we just expect <code>float</code> as input. We usually don't expect <code>option&lt;float&gt;</code>
+or <code>list&lt;float&gt;</code> as the input.
 </li>
 <li>
 Then we call <code>getUserInput "Enter radius"</code>. The user will see "Enter radius: " and he must enter
@@ -326,26 +343,26 @@ an <code>option</code> value. So how do we do that? We use our <code>retn</code>
 a normal <code>float</code> into an <code>option&lt;float&gt;</code>
 </li>
 <li>
-Our outer <code>area</code> is now a "option<float>" that either is <code>Some</code> and contains the calculated area
+Our outer <code>area</code> is now a <code>option&lt;float&gt;</code> that either is <code>Some</code> and contains the calculated area
 for a circle. Or it is <code>None</code>, because the user input could not be parsed.
 </li>
 </ol>
-<p>Currently we don't print the result. So let's print "area". As the outer "area" (outside of the
+<p>Currently we don't print the result. So let's print <code>area</code>. As <code>area</code> (outside of the
 continuation function) is now a <code>option&lt;float&gt;</code> we have to Pattern Match it to see if our computation
-was successful (userInput was a valid <code>float</code>) or not.</p>
+was successful or not.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">match</span> <span onmouseout="hideTip(event, 'fs54', 141)" onmouseover="showTip(event, 'fs54', 141)" class="i">area</span> <span class="k">with</span>
-| <span onmouseout="hideTip(event, 'fs7', 142)" onmouseover="showTip(event, 'fs7', 142)" class="p">None</span>      <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 143)" onmouseover="showTip(event, 'fs45', 143)" class="f">printfn</span> <span class="s">&quot;User Input was not a valid number&quot;</span>
-| <span onmouseout="hideTip(event, 'fs9', 144)" onmouseover="showTip(event, 'fs9', 144)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs56', 145)" onmouseover="showTip(event, 'fs56', 145)" class="i">area</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 146)" onmouseover="showTip(event, 'fs45', 146)" class="f">printfn</span> <span class="s">&quot;The area of a circle is </span><span class="pf">%f</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs56', 147)" onmouseover="showTip(event, 'fs56', 147)" class="i">area</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">match</span> <span onmouseout="hideTip(event, 'fs54', 144)" onmouseover="showTip(event, 'fs54', 144)" class="i">area</span> <span class="k">with</span>
+| <span onmouseout="hideTip(event, 'fs7', 145)" onmouseover="showTip(event, 'fs7', 145)" class="p">None</span>      <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 146)" onmouseover="showTip(event, 'fs45', 146)" class="f">printfn</span> <span class="s">&quot;User Input was not a valid number&quot;</span>
+| <span onmouseout="hideTip(event, 'fs9', 147)" onmouseover="showTip(event, 'fs9', 147)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs56', 148)" onmouseover="showTip(event, 'fs56', 148)" class="i">area</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 149)" onmouseover="showTip(event, 'fs45', 149)" class="f">printfn</span> <span class="s">&quot;The area of a circle is </span><span class="pf">%f</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs56', 150)" onmouseover="showTip(event, 'fs56', 150)" class="i">area</span>
 </code></pre></td>
 </tr>
 </table>
 <p>If the user input was <code>10</code> for example, we will see <code>The area of a circle is 314.159265</code>, but if we provide
-an invalid input, we just see <code>User Input was not a valid number</code>. In our example we first have some
-<code>option</code> value and we pass it to <code>Option.bind</code> with <code>|&gt;</code>. This happens often, that is why we created
+an invalid input, we just see <code>User Input was not a valid number</code>. In our example we first had a<br />
+<code>option</code> value and passed it to <code>Option.bind</code> with <code>|&gt;</code>. This happens often, that is why we created
 <code>&gt;&gt;=</code> previously.</p>
 <p>Let's extend that example. We now ask the user for three inputs. And we will calculate the volume
 of a cube.</p>
@@ -361,28 +378,28 @@ of a cube.</p>
 <span class="l">10: </span>
 <span class="l">11: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs57', 148)" onmouseover="showTip(event, 'fs57', 148)" class="i">cubeVolume</span> <span class="o">=</span>
-    <span onmouseout="hideTip(event, 'fs43', 149)" onmouseover="showTip(event, 'fs43', 149)" class="f">getUserInput</span> <span class="s">&quot;Length X&quot;</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs8', 150)" onmouseover="showTip(event, 'fs8', 150)" class="i">x</span> <span class="k">-&gt;</span>
-    <span onmouseout="hideTip(event, 'fs43', 151)" onmouseover="showTip(event, 'fs43', 151)" class="f">getUserInput</span> <span class="s">&quot;Length Y&quot;</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs58', 152)" onmouseover="showTip(event, 'fs58', 152)" class="i">y</span> <span class="k">-&gt;</span>
-    <span onmouseout="hideTip(event, 'fs43', 153)" onmouseover="showTip(event, 'fs43', 153)" class="f">getUserInput</span> <span class="s">&quot;Length Z&quot;</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs59', 154)" onmouseover="showTip(event, 'fs59', 154)" class="i">z</span> <span class="k">-&gt;</span>
-        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs60', 155)" onmouseover="showTip(event, 'fs60', 155)" class="i">volume</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 156)" onmouseover="showTip(event, 'fs8', 156)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs58', 157)" onmouseover="showTip(event, 'fs58', 157)" class="i">y</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs59', 158)" onmouseover="showTip(event, 'fs59', 158)" class="i">z</span>
-        <span onmouseout="hideTip(event, 'fs49', 159)" onmouseover="showTip(event, 'fs49', 159)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs60', 160)" onmouseover="showTip(event, 'fs60', 160)" class="i">volume</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs57', 151)" onmouseover="showTip(event, 'fs57', 151)" class="i">cubeVolume</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs43', 152)" onmouseover="showTip(event, 'fs43', 152)" class="f">getUserInput</span> <span class="s">&quot;Length X&quot;</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs8', 153)" onmouseover="showTip(event, 'fs8', 153)" class="i">x</span> <span class="k">-&gt;</span>
+    <span onmouseout="hideTip(event, 'fs43', 154)" onmouseover="showTip(event, 'fs43', 154)" class="f">getUserInput</span> <span class="s">&quot;Length Y&quot;</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs58', 155)" onmouseover="showTip(event, 'fs58', 155)" class="i">y</span> <span class="k">-&gt;</span>
+    <span onmouseout="hideTip(event, 'fs43', 156)" onmouseover="showTip(event, 'fs43', 156)" class="f">getUserInput</span> <span class="s">&quot;Length Z&quot;</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs59', 157)" onmouseover="showTip(event, 'fs59', 157)" class="i">z</span> <span class="k">-&gt;</span>
+        <span class="k">let</span> <span onmouseout="hideTip(event, 'fs60', 158)" onmouseover="showTip(event, 'fs60', 158)" class="i">volume</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 159)" onmouseover="showTip(event, 'fs8', 159)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs58', 160)" onmouseover="showTip(event, 'fs58', 160)" class="i">y</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs59', 161)" onmouseover="showTip(event, 'fs59', 161)" class="i">z</span>
+        <span onmouseout="hideTip(event, 'fs49', 162)" onmouseover="showTip(event, 'fs49', 162)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs60', 163)" onmouseover="showTip(event, 'fs60', 163)" class="i">volume</span>
     )))
 
-<span class="k">match</span> <span onmouseout="hideTip(event, 'fs57', 161)" onmouseover="showTip(event, 'fs57', 161)" class="i">cubeVolume</span> <span class="k">with</span>
-| <span onmouseout="hideTip(event, 'fs7', 162)" onmouseover="showTip(event, 'fs7', 162)" class="p">None</span>        <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 163)" onmouseover="showTip(event, 'fs45', 163)" class="f">printfn</span> <span class="s">&quot;Not all inputs were valid&quot;</span>
-| <span onmouseout="hideTip(event, 'fs9', 164)" onmouseover="showTip(event, 'fs9', 164)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs60', 165)" onmouseover="showTip(event, 'fs60', 165)" class="i">volume</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 166)" onmouseover="showTip(event, 'fs45', 166)" class="f">printfn</span> <span class="s">&quot;Volume of cube is: </span><span class="pf">%f</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs60', 167)" onmouseover="showTip(event, 'fs60', 167)" class="i">volume</span>
+<span class="k">match</span> <span onmouseout="hideTip(event, 'fs57', 164)" onmouseover="showTip(event, 'fs57', 164)" class="i">cubeVolume</span> <span class="k">with</span>
+| <span onmouseout="hideTip(event, 'fs7', 165)" onmouseover="showTip(event, 'fs7', 165)" class="p">None</span>        <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 166)" onmouseover="showTip(event, 'fs45', 166)" class="f">printfn</span> <span class="s">&quot;Not all inputs were valid&quot;</span>
+| <span onmouseout="hideTip(event, 'fs9', 167)" onmouseover="showTip(event, 'fs9', 167)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs60', 168)" onmouseover="showTip(event, 'fs60', 168)" class="i">volume</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 169)" onmouseover="showTip(event, 'fs45', 169)" class="f">printfn</span> <span class="s">&quot;Volume of cube is: </span><span class="pf">%f</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs60', 170)" onmouseover="showTip(event, 'fs60', 170)" class="i">volume</span>
 </code></pre></td>
 </tr>
 </table>
-<p>As we now can see. We ask the user three times for a number for X, Y and Z. If all inputs were valid. We
+<p>As we can see now. We ask the user three times to input a number X, Y and Z. If all inputs were valid. We
 just calculate the volume with <code>let volume = x * y * z</code>. The important aspect is that all of our values
 are always <code>float</code> never <code>option&lt;float&gt;</code>, because the <code>bind</code> operation <code>&gt;&gt;=</code> already did the
 unwrapping for us.</p>
 <p>And probably it now becomes clear why we named our <em>constructor</em> <code>return</code> (retn). Inside of our
-continuations functions we never have lifted values. But at the end of our continuation functions we
+continuation functions we never have lifted values. But at the end of our continuation functions we
 always must return a lifted value. So <em>lifting</em> and <em>returning</em> is always the last statement we do.</p>
-<p>Let's inspect the syntax a little bit deeper. Look at the syntax of a normal "let"
+<p>Let's inspect the syntax a little bit deeper. Look at the syntax of a normal <code>let</code>
 definition in F#. Usually a <code>let</code> definition contains a name, a equal "=" and a expression that
 will be executed. Actually just look at the following two lines and just compare them.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
@@ -393,7 +410,7 @@ will be executed. Actually just look at the following two lines and just compare
 </code></pre></td>
 </tr>
 </table>
-<p>So, do you spot the similarities?</p>
+<p>Do you spot the similarities?</p>
 <ol>
 <li>Both definition have an expression <code>getUserInput "Length X"</code> this expression will be executed.</li>
 <li>In the first example: We only have <code>=</code> for assignment, and we assign the result to <code>let x</code>.</li>
@@ -427,11 +444,11 @@ that contains a <code>Bind</code> and <code>Return</code> method that we want to
 <span class="l">4: </span>
 <span class="l">5: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs61', 168)" onmouseover="showTip(event, 'fs61', 168)" class="t">MaybeBuilder</span>() <span class="o">=</span>
-    <span class="k">member</span> <span onmouseout="hideTip(event, 'fs62', 169)" onmouseover="showTip(event, 'fs62', 169)" class="i">o</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs63', 170)" onmouseover="showTip(event, 'fs63', 170)" class="f">Bind</span>(<span onmouseout="hideTip(event, 'fs64', 171)" onmouseover="showTip(event, 'fs64', 171)" class="i">m</span>,<span onmouseout="hideTip(event, 'fs65', 172)" onmouseover="showTip(event, 'fs65', 172)" class="f">f</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs41', 173)" onmouseover="showTip(event, 'fs41', 173)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 174)" onmouseover="showTip(event, 'fs42', 174)" class="f">bind</span> <span onmouseout="hideTip(event, 'fs65', 175)" onmouseover="showTip(event, 'fs65', 175)" class="f">f</span> <span onmouseout="hideTip(event, 'fs64', 176)" onmouseover="showTip(event, 'fs64', 176)" class="i">m</span>
-    <span class="k">member</span> <span onmouseout="hideTip(event, 'fs62', 177)" onmouseover="showTip(event, 'fs62', 177)" class="i">o</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs66', 178)" onmouseover="showTip(event, 'fs66', 178)" class="f">Return</span>(<span onmouseout="hideTip(event, 'fs18', 179)" onmouseover="showTip(event, 'fs18', 179)" class="i">x</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 180)" onmouseover="showTip(event, 'fs9', 180)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs18', 181)" onmouseover="showTip(event, 'fs18', 181)" class="i">x</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">type</span> <span onmouseout="hideTip(event, 'fs61', 171)" onmouseover="showTip(event, 'fs61', 171)" class="t">MaybeBuilder</span>() <span class="o">=</span>
+    <span class="k">member</span> <span onmouseout="hideTip(event, 'fs62', 172)" onmouseover="showTip(event, 'fs62', 172)" class="i">o</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs63', 173)" onmouseover="showTip(event, 'fs63', 173)" class="f">Bind</span>(<span onmouseout="hideTip(event, 'fs64', 174)" onmouseover="showTip(event, 'fs64', 174)" class="i">m</span>,<span onmouseout="hideTip(event, 'fs65', 175)" onmouseover="showTip(event, 'fs65', 175)" class="f">f</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs41', 176)" onmouseover="showTip(event, 'fs41', 176)" class="t">Option</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs42', 177)" onmouseover="showTip(event, 'fs42', 177)" class="f">bind</span> <span onmouseout="hideTip(event, 'fs65', 178)" onmouseover="showTip(event, 'fs65', 178)" class="f">f</span> <span onmouseout="hideTip(event, 'fs64', 179)" onmouseover="showTip(event, 'fs64', 179)" class="i">m</span>
+    <span class="k">member</span> <span onmouseout="hideTip(event, 'fs62', 180)" onmouseover="showTip(event, 'fs62', 180)" class="i">o</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs66', 181)" onmouseover="showTip(event, 'fs66', 181)" class="f">Return</span>(<span onmouseout="hideTip(event, 'fs18', 182)" onmouseover="showTip(event, 'fs18', 182)" class="i">x</span>) <span class="o">=</span> <span onmouseout="hideTip(event, 'fs9', 183)" onmouseover="showTip(event, 'fs9', 183)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs18', 184)" onmouseover="showTip(event, 'fs18', 184)" class="i">x</span>
 
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs67', 182)" onmouseover="showTip(event, 'fs67', 182)" class="i">maybe</span> <span class="o">=</span> <span class="k">new</span> <span onmouseout="hideTip(event, 'fs61', 183)" onmouseover="showTip(event, 'fs61', 183)" class="t">MaybeBuilder</span>()
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs67', 185)" onmouseover="showTip(event, 'fs67', 185)" class="i">maybe</span> <span class="o">=</span> <span class="k">new</span> <span onmouseout="hideTip(event, 'fs61', 186)" onmouseover="showTip(event, 'fs61', 186)" class="t">MaybeBuilder</span>()
 </code></pre></td>
 </tr>
 </table>
@@ -450,17 +467,17 @@ can use the following special syntax.</p>
 <span class="l">10: </span>
 <span class="l">11: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs68', 184)" onmouseover="showTip(event, 'fs68', 184)" class="i">cubeVolume2</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs67', 185)" onmouseover="showTip(event, 'fs67', 185)" class="i">maybe</span> {
-    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs8', 186)" onmouseover="showTip(event, 'fs8', 186)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 187)" onmouseover="showTip(event, 'fs43', 187)" class="f">getUserInput</span> <span class="s">&quot;Length X&quot;</span>
-    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs58', 188)" onmouseover="showTip(event, 'fs58', 188)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 189)" onmouseover="showTip(event, 'fs43', 189)" class="f">getUserInput</span> <span class="s">&quot;Length Y&quot;</span>
-    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs59', 190)" onmouseover="showTip(event, 'fs59', 190)" class="i">z</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 191)" onmouseover="showTip(event, 'fs43', 191)" class="f">getUserInput</span> <span class="s">&quot;Length Z&quot;</span>
-    <span class="k">let</span>  <span onmouseout="hideTip(event, 'fs60', 192)" onmouseover="showTip(event, 'fs60', 192)" class="i">volume</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 193)" onmouseover="showTip(event, 'fs8', 193)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs58', 194)" onmouseover="showTip(event, 'fs58', 194)" class="i">y</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs59', 195)" onmouseover="showTip(event, 'fs59', 195)" class="i">z</span>
-    <span class="k">return</span> <span onmouseout="hideTip(event, 'fs60', 196)" onmouseover="showTip(event, 'fs60', 196)" class="i">volume</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs68', 187)" onmouseover="showTip(event, 'fs68', 187)" class="i">cubeVolume2</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs67', 188)" onmouseover="showTip(event, 'fs67', 188)" class="i">maybe</span> {
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs8', 189)" onmouseover="showTip(event, 'fs8', 189)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 190)" onmouseover="showTip(event, 'fs43', 190)" class="f">getUserInput</span> <span class="s">&quot;Length X&quot;</span>
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs58', 191)" onmouseover="showTip(event, 'fs58', 191)" class="i">y</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 192)" onmouseover="showTip(event, 'fs43', 192)" class="f">getUserInput</span> <span class="s">&quot;Length Y&quot;</span>
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs59', 193)" onmouseover="showTip(event, 'fs59', 193)" class="i">z</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs43', 194)" onmouseover="showTip(event, 'fs43', 194)" class="f">getUserInput</span> <span class="s">&quot;Length Z&quot;</span>
+    <span class="k">let</span>  <span onmouseout="hideTip(event, 'fs60', 195)" onmouseover="showTip(event, 'fs60', 195)" class="i">volume</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs8', 196)" onmouseover="showTip(event, 'fs8', 196)" class="i">x</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs58', 197)" onmouseover="showTip(event, 'fs58', 197)" class="i">y</span> <span class="o">*</span> <span onmouseout="hideTip(event, 'fs59', 198)" onmouseover="showTip(event, 'fs59', 198)" class="i">z</span>
+    <span class="k">return</span> <span onmouseout="hideTip(event, 'fs60', 199)" onmouseover="showTip(event, 'fs60', 199)" class="i">volume</span>
 }
 
-<span class="k">match</span> <span onmouseout="hideTip(event, 'fs68', 197)" onmouseover="showTip(event, 'fs68', 197)" class="i">cubeVolume2</span> <span class="k">with</span>
-| <span onmouseout="hideTip(event, 'fs7', 198)" onmouseover="showTip(event, 'fs7', 198)" class="p">None</span>     <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 199)" onmouseover="showTip(event, 'fs45', 199)" class="f">printfn</span> <span class="s">&quot;User entered some invalid number&quot;</span>
-| <span onmouseout="hideTip(event, 'fs9', 200)" onmouseover="showTip(event, 'fs9', 200)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs69', 201)" onmouseover="showTip(event, 'fs69', 201)" class="i">vol</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 202)" onmouseover="showTip(event, 'fs45', 202)" class="f">printfn</span> <span class="s">&quot;Cube volume is </span><span class="pf">%f</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs69', 203)" onmouseover="showTip(event, 'fs69', 203)" class="i">vol</span>
+<span class="k">match</span> <span onmouseout="hideTip(event, 'fs68', 200)" onmouseover="showTip(event, 'fs68', 200)" class="i">cubeVolume2</span> <span class="k">with</span>
+| <span onmouseout="hideTip(event, 'fs7', 201)" onmouseover="showTip(event, 'fs7', 201)" class="p">None</span>     <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 202)" onmouseover="showTip(event, 'fs45', 202)" class="f">printfn</span> <span class="s">&quot;User entered some invalid number&quot;</span>
+| <span onmouseout="hideTip(event, 'fs9', 203)" onmouseover="showTip(event, 'fs9', 203)" class="p">Some</span> <span onmouseout="hideTip(event, 'fs69', 204)" onmouseover="showTip(event, 'fs69', 204)" class="i">vol</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs45', 205)" onmouseover="showTip(event, 'fs45', 205)" class="f">printfn</span> <span class="s">&quot;Cube volume is </span><span class="pf">%f</span><span class="s">&quot;</span> <span onmouseout="hideTip(event, 'fs69', 206)" onmouseover="showTip(event, 'fs69', 206)" class="i">vol</span>
 </code></pre></td>
 </tr>
 </table>
@@ -517,29 +534,29 @@ implement <code>map</code> through <code>return</code> and <code>apply</code>. B
 <span class="l">25: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="c">// map with bind operator</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs70', 204)" onmouseover="showTip(event, 'fs70', 204)" class="f">map</span> <span onmouseout="hideTip(event, 'fs16', 205)" onmouseover="showTip(event, 'fs16', 205)" class="f">f</span> <span onmouseout="hideTip(event, 'fs17', 206)" onmouseover="showTip(event, 'fs17', 206)" class="i">opt</span> <span class="o">=</span> 
-    <span onmouseout="hideTip(event, 'fs17', 207)" onmouseover="showTip(event, 'fs17', 207)" class="i">opt</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 208)" onmouseover="showTip(event, 'fs18', 208)" class="i">x</span> <span class="k">-&gt;</span> <span class="c">// unbox option</span>
-        <span onmouseout="hideTip(event, 'fs49', 209)" onmouseover="showTip(event, 'fs49', 209)" class="f">retn</span> (<span onmouseout="hideTip(event, 'fs16', 210)" onmouseover="showTip(event, 'fs16', 210)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 211)" onmouseover="showTip(event, 'fs18', 211)" class="i">x</span>)    <span class="c">// execute (f x) and box result</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs70', 207)" onmouseover="showTip(event, 'fs70', 207)" class="f">map</span> <span onmouseout="hideTip(event, 'fs16', 208)" onmouseover="showTip(event, 'fs16', 208)" class="f">f</span> <span onmouseout="hideTip(event, 'fs17', 209)" onmouseover="showTip(event, 'fs17', 209)" class="i">opt</span> <span class="o">=</span> 
+    <span onmouseout="hideTip(event, 'fs17', 210)" onmouseover="showTip(event, 'fs17', 210)" class="i">opt</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 211)" onmouseover="showTip(event, 'fs18', 211)" class="i">x</span> <span class="k">-&gt;</span> <span class="c">// unbox option</span>
+        <span onmouseout="hideTip(event, 'fs49', 212)" onmouseover="showTip(event, 'fs49', 212)" class="f">retn</span> (<span onmouseout="hideTip(event, 'fs16', 213)" onmouseover="showTip(event, 'fs16', 213)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 214)" onmouseover="showTip(event, 'fs18', 214)" class="i">x</span>)    <span class="c">// execute (f x) and box result</span>
     )
 
 <span class="c">// map defined with Computation Expression</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs70', 212)" onmouseover="showTip(event, 'fs70', 212)" class="f">map</span> <span onmouseout="hideTip(event, 'fs16', 213)" onmouseover="showTip(event, 'fs16', 213)" class="f">f</span> <span onmouseout="hideTip(event, 'fs17', 214)" onmouseover="showTip(event, 'fs17', 214)" class="i">opt</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs67', 215)" onmouseover="showTip(event, 'fs67', 215)" class="i">maybe</span> {
-    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs71', 216)" onmouseover="showTip(event, 'fs71', 216)" class="i">o</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs17', 217)" onmouseover="showTip(event, 'fs17', 217)" class="i">opt</span>  <span class="c">// unbox option</span>
-    <span class="k">return</span> <span onmouseout="hideTip(event, 'fs16', 218)" onmouseover="showTip(event, 'fs16', 218)" class="f">f</span> <span onmouseout="hideTip(event, 'fs71', 219)" onmouseover="showTip(event, 'fs71', 219)" class="i">o</span>    <span class="c">// execute (f x) and box result</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs70', 215)" onmouseover="showTip(event, 'fs70', 215)" class="f">map</span> <span onmouseout="hideTip(event, 'fs16', 216)" onmouseover="showTip(event, 'fs16', 216)" class="f">f</span> <span onmouseout="hideTip(event, 'fs17', 217)" onmouseover="showTip(event, 'fs17', 217)" class="i">opt</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs67', 218)" onmouseover="showTip(event, 'fs67', 218)" class="i">maybe</span> {
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs18', 219)" onmouseover="showTip(event, 'fs18', 219)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs17', 220)" onmouseover="showTip(event, 'fs17', 220)" class="i">opt</span>  <span class="c">// unbox option</span>
+    <span class="k">return</span> <span onmouseout="hideTip(event, 'fs16', 221)" onmouseover="showTip(event, 'fs16', 221)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 222)" onmouseover="showTip(event, 'fs18', 222)" class="i">x</span>    <span class="c">// execute (f x) and box result</span>
 }
 
 <span class="c">// Apply with bind operator</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs72', 220)" onmouseover="showTip(event, 'fs72', 220)" class="f">apply</span> <span onmouseout="hideTip(event, 'fs73', 221)" onmouseover="showTip(event, 'fs73', 221)" class="i">fo</span> <span onmouseout="hideTip(event, 'fs74', 222)" onmouseover="showTip(event, 'fs74', 222)" class="i">xo</span> <span class="o">=</span>
-    <span onmouseout="hideTip(event, 'fs73', 223)" onmouseover="showTip(event, 'fs73', 223)" class="i">fo</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs16', 224)" onmouseover="showTip(event, 'fs16', 224)" class="f">f</span> <span class="k">-&gt;</span>  <span class="c">// unbox function</span>
-    <span onmouseout="hideTip(event, 'fs74', 225)" onmouseover="showTip(event, 'fs74', 225)" class="i">xo</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 226)" onmouseover="showTip(event, 'fs18', 226)" class="i">x</span> <span class="k">-&gt;</span>  <span class="c">// unbox value</span>
-        <span onmouseout="hideTip(event, 'fs49', 227)" onmouseover="showTip(event, 'fs49', 227)" class="f">retn</span> (<span onmouseout="hideTip(event, 'fs16', 228)" onmouseover="showTip(event, 'fs16', 228)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 229)" onmouseover="showTip(event, 'fs18', 229)" class="i">x</span>)    <span class="c">// execute (f x) and box result</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs71', 223)" onmouseover="showTip(event, 'fs71', 223)" class="f">apply</span> <span onmouseout="hideTip(event, 'fs72', 224)" onmouseover="showTip(event, 'fs72', 224)" class="i">fo</span> <span onmouseout="hideTip(event, 'fs73', 225)" onmouseover="showTip(event, 'fs73', 225)" class="i">xo</span> <span class="o">=</span>
+    <span onmouseout="hideTip(event, 'fs72', 226)" onmouseover="showTip(event, 'fs72', 226)" class="i">fo</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs16', 227)" onmouseover="showTip(event, 'fs16', 227)" class="f">f</span> <span class="k">-&gt;</span>  <span class="c">// unbox function</span>
+    <span onmouseout="hideTip(event, 'fs73', 228)" onmouseover="showTip(event, 'fs73', 228)" class="i">xo</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span class="k">fun</span> <span onmouseout="hideTip(event, 'fs18', 229)" onmouseover="showTip(event, 'fs18', 229)" class="i">x</span> <span class="k">-&gt;</span>  <span class="c">// unbox value</span>
+        <span onmouseout="hideTip(event, 'fs49', 230)" onmouseover="showTip(event, 'fs49', 230)" class="f">retn</span> (<span onmouseout="hideTip(event, 'fs16', 231)" onmouseover="showTip(event, 'fs16', 231)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 232)" onmouseover="showTip(event, 'fs18', 232)" class="i">x</span>)    <span class="c">// execute (f x) and box result</span>
     ))
 
 <span class="c">// Apply with Computation expression</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs72', 230)" onmouseover="showTip(event, 'fs72', 230)" class="f">apply</span> <span onmouseout="hideTip(event, 'fs73', 231)" onmouseover="showTip(event, 'fs73', 231)" class="i">fo</span> <span onmouseout="hideTip(event, 'fs74', 232)" onmouseover="showTip(event, 'fs74', 232)" class="i">xo</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs67', 233)" onmouseover="showTip(event, 'fs67', 233)" class="i">maybe</span> {
-    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs16', 234)" onmouseover="showTip(event, 'fs16', 234)" class="f">f</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs73', 235)" onmouseover="showTip(event, 'fs73', 235)" class="i">fo</span>  <span class="c">// unbox function</span>
-    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs18', 236)" onmouseover="showTip(event, 'fs18', 236)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs74', 237)" onmouseover="showTip(event, 'fs74', 237)" class="i">xo</span>  <span class="c">// unbox value</span>
-    <span class="k">return</span> <span onmouseout="hideTip(event, 'fs16', 238)" onmouseover="showTip(event, 'fs16', 238)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 239)" onmouseover="showTip(event, 'fs18', 239)" class="i">x</span>   <span class="c">// execute (f x) and box result</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs71', 233)" onmouseover="showTip(event, 'fs71', 233)" class="f">apply</span> <span onmouseout="hideTip(event, 'fs72', 234)" onmouseover="showTip(event, 'fs72', 234)" class="i">fo</span> <span onmouseout="hideTip(event, 'fs73', 235)" onmouseover="showTip(event, 'fs73', 235)" class="i">xo</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs67', 236)" onmouseover="showTip(event, 'fs67', 236)" class="i">maybe</span> {
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs16', 237)" onmouseover="showTip(event, 'fs16', 237)" class="f">f</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs72', 238)" onmouseover="showTip(event, 'fs72', 238)" class="i">fo</span>  <span class="c">// unbox function</span>
+    <span class="k">let!</span> <span onmouseout="hideTip(event, 'fs18', 239)" onmouseover="showTip(event, 'fs18', 239)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs73', 240)" onmouseover="showTip(event, 'fs73', 240)" class="i">xo</span>  <span class="c">// unbox value</span>
+    <span class="k">return</span> <span onmouseout="hideTip(event, 'fs16', 241)" onmouseover="showTip(event, 'fs16', 241)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 242)" onmouseover="showTip(event, 'fs18', 242)" class="i">x</span>   <span class="c">// execute (f x) and box result</span>
 }
 </code></pre></td>
 </tr>
@@ -560,12 +577,12 @@ as they don't have matching input/output.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 240)" onmouseover="showTip(event, 'fs11', 240)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">b</span><span class="o">&gt;</span>
-<span class="o">&#39;</span><span class="i">b</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 241)" onmouseover="showTip(event, 'fs11', 241)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">c</span><span class="o">&gt;</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 243)" onmouseover="showTip(event, 'fs11', 243)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">b</span><span class="o">&gt;</span>
+<span class="o">&#39;</span><span class="i">b</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 244)" onmouseover="showTip(event, 'fs11', 244)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">c</span><span class="o">&gt;</span>
 </code></pre></td>
 </tr>
 </table>
-<p>This functions cannot be composed because <code>option&lt;'b&gt;</code> is not the same as <code>'b</code>. But with our
+<p>These functions cannot be composed because <code>option&lt;'b&gt;</code> is not the same as <code>'b</code>. But with our
 bind operator <code>&gt;&gt;=</code> we can easily pass boxed values into function that don't expect them. Because
 of that we also can create a compose function that directly compose two <em>Monadic functions</em>.
 We use the operator <code>&gt;=&gt;</code> for this kind of composition. This kind of composition is also named
@@ -573,37 +590,37 @@ We use the operator <code>&gt;=&gt;</code> for this kind of composition. This ki
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> (<span class="o">&gt;</span><span class="o">&gt;</span>)  <span onmouseout="hideTip(event, 'fs16', 242)" onmouseover="showTip(event, 'fs16', 242)" class="f">f</span> <span onmouseout="hideTip(event, 'fs75', 243)" onmouseover="showTip(event, 'fs75', 243)" class="f">g</span> <span onmouseout="hideTip(event, 'fs18', 244)" onmouseover="showTip(event, 'fs18', 244)" class="i">x</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs16', 245)" onmouseover="showTip(event, 'fs16', 245)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 246)" onmouseover="showTip(event, 'fs18', 246)" class="i">x</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs75', 247)" onmouseover="showTip(event, 'fs75', 247)" class="f">g</span>   <span class="c">// This is how normal composition is defined</span>
-<span class="k">let</span> (<span class="o">&gt;</span><span class="o">=&gt;</span>) <span onmouseout="hideTip(event, 'fs20', 248)" onmouseover="showTip(event, 'fs20', 248)" class="f">f</span> <span onmouseout="hideTip(event, 'fs76', 249)" onmouseover="showTip(event, 'fs76', 249)" class="f">g</span> <span onmouseout="hideTip(event, 'fs18', 250)" onmouseover="showTip(event, 'fs18', 250)" class="i">x</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs20', 251)" onmouseover="showTip(event, 'fs20', 251)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 252)" onmouseover="showTip(event, 'fs18', 252)" class="i">x</span>) <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs76', 253)" onmouseover="showTip(event, 'fs76', 253)" class="f">g</span>  <span class="c">// This is Kleisli composition</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> (<span class="o">&gt;</span><span class="o">&gt;</span>)  <span onmouseout="hideTip(event, 'fs16', 245)" onmouseover="showTip(event, 'fs16', 245)" class="f">f</span> <span onmouseout="hideTip(event, 'fs74', 246)" onmouseover="showTip(event, 'fs74', 246)" class="f">g</span> <span onmouseout="hideTip(event, 'fs18', 247)" onmouseover="showTip(event, 'fs18', 247)" class="i">x</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs16', 248)" onmouseover="showTip(event, 'fs16', 248)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 249)" onmouseover="showTip(event, 'fs18', 249)" class="i">x</span>) <span class="o">|&gt;</span> <span onmouseout="hideTip(event, 'fs74', 250)" onmouseover="showTip(event, 'fs74', 250)" class="f">g</span>   <span class="c">// This is how normal composition is defined</span>
+<span class="k">let</span> (<span class="o">&gt;</span><span class="o">=&gt;</span>) <span onmouseout="hideTip(event, 'fs20', 251)" onmouseover="showTip(event, 'fs20', 251)" class="f">f</span> <span onmouseout="hideTip(event, 'fs75', 252)" onmouseover="showTip(event, 'fs75', 252)" class="f">g</span> <span onmouseout="hideTip(event, 'fs18', 253)" onmouseover="showTip(event, 'fs18', 253)" class="i">x</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs20', 254)" onmouseover="showTip(event, 'fs20', 254)" class="f">f</span> <span onmouseout="hideTip(event, 'fs18', 255)" onmouseover="showTip(event, 'fs18', 255)" class="i">x</span>) <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs75', 256)" onmouseover="showTip(event, 'fs75', 256)" class="f">g</span>  <span class="c">// This is Kleisli composition</span>
 </code></pre></td>
 </tr>
 </table>
 <p>Now we can compose two <em>Monadic</em> functions directly.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 254)" onmouseover="showTip(event, 'fs11', 254)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">b</span><span class="o">&gt;</span>) <span class="o">&gt;</span><span class="o">=&gt;</span> (<span class="o">&#39;</span><span class="i">b</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 255)" onmouseover="showTip(event, 'fs11', 255)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">c</span><span class="o">&gt;</span>)
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp">(<span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 257)" onmouseover="showTip(event, 'fs11', 257)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">b</span><span class="o">&gt;</span>) <span class="o">&gt;</span><span class="o">=&gt;</span> (<span class="o">&#39;</span><span class="i">b</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 258)" onmouseover="showTip(event, 'fs11', 258)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">c</span><span class="o">&gt;</span>)
 </code></pre></td>
 </tr>
 </table>
 <p>the result is a new <em>Monadic function</em>.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 256)" onmouseover="showTip(event, 'fs11', 256)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">c</span><span class="o">&gt;</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="o">&#39;</span><span class="i">a</span> <span class="k">-&gt;</span> <span onmouseout="hideTip(event, 'fs11', 259)" onmouseover="showTip(event, 'fs11', 259)" class="i">option</span><span class="o">&lt;</span><span class="o">&#39;</span><span class="i">c</span><span class="o">&gt;</span>
 </code></pre></td>
 </tr>
 </table>
 <h2>Laws</h2>
 <p>We already saw Laws for <em>Functors</em> and <em>Applicative Functors</em>. The combination of <code>return</code>
-and <code>bind</code> (a Monad) also must satisfy three laws. in the following description I use</p>
+and <code>bind</code> (a Monad) also must satisfy three laws. In the following description I use</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 <span class="l">2: </span>
 <span class="l">3: </span>
 <span class="l">4: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs77', 257)" onmouseover="showTip(event, 'fs77', 257)" class="f">f</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 258)" onmouseover="showTip(event, 'fs3', 258)" class="t">Double</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 259)" onmouseover="showTip(event, 'fs26', 259)" class="f">tryParse</span> <span class="c">// string -&gt; option&lt;float&gt;</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs78', 260)" onmouseover="showTip(event, 'fs78', 260)" class="f">g</span> <span onmouseout="hideTip(event, 'fs8', 261)" onmouseover="showTip(event, 'fs8', 261)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs49', 262)" onmouseover="showTip(event, 'fs49', 262)" class="f">retn</span> (<span onmouseout="hideTip(event, 'fs8', 263)" onmouseover="showTip(event, 'fs8', 263)" class="i">x</span> <span class="o">*</span> <span class="n">2.0</span>)  <span class="c">// float -&gt; option&lt;float&gt;</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs79', 264)" onmouseover="showTip(event, 'fs79', 264)" class="i">x</span>   <span class="o">=</span> <span class="s">&quot;10&quot;</span>            <span class="c">// string         -- unboxed value</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs80', 265)" onmouseover="showTip(event, 'fs80', 265)" class="i">m</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs49', 266)" onmouseover="showTip(event, 'fs49', 266)" class="f">retn</span> <span class="s">&quot;10&quot;</span>      <span class="c">// option&lt;string&gt; -- a boxed value</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs76', 260)" onmouseover="showTip(event, 'fs76', 260)" class="f">f</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs3', 261)" onmouseover="showTip(event, 'fs3', 261)" class="t">Double</span><span class="o">.</span><span onmouseout="hideTip(event, 'fs26', 262)" onmouseover="showTip(event, 'fs26', 262)" class="f">tryParse</span> <span class="c">// string -&gt; option&lt;float&gt;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs77', 263)" onmouseover="showTip(event, 'fs77', 263)" class="f">g</span> <span onmouseout="hideTip(event, 'fs8', 264)" onmouseover="showTip(event, 'fs8', 264)" class="i">x</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs49', 265)" onmouseover="showTip(event, 'fs49', 265)" class="f">retn</span> (<span onmouseout="hideTip(event, 'fs8', 266)" onmouseover="showTip(event, 'fs8', 266)" class="i">x</span> <span class="o">*</span> <span class="n">2.0</span>)  <span class="c">// float  -&gt; option&lt;float&gt;</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs78', 267)" onmouseover="showTip(event, 'fs78', 267)" class="i">x</span>   <span class="o">=</span> <span class="s">&quot;10&quot;</span>            <span class="c">// string         -- unboxed value</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs79', 268)" onmouseover="showTip(event, 'fs79', 268)" class="i">m</span>   <span class="o">=</span> <span onmouseout="hideTip(event, 'fs49', 269)" onmouseover="showTip(event, 'fs49', 269)" class="f">retn</span> <span class="s">&quot;10&quot;</span>       <span class="c">// option&lt;string&gt; -- a boxed value</span>
 </code></pre></td>
 </tr>
 </table>
@@ -614,7 +631,7 @@ values makes it easier to understand the laws.</p>
 It is the same as directly passing the value to a function.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs49', 267)" onmouseover="showTip(event, 'fs49', 267)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs79', 268)" onmouseover="showTip(event, 'fs79', 268)" class="i">x</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs77', 269)" onmouseover="showTip(event, 'fs77', 269)" class="f">f</span>  <span class="o">=</span>  <span onmouseout="hideTip(event, 'fs77', 270)" onmouseover="showTip(event, 'fs77', 270)" class="f">f</span> <span onmouseout="hideTip(event, 'fs79', 271)" onmouseover="showTip(event, 'fs79', 271)" class="i">x</span>  <span class="c">// (Some 10.0) = (Some 10.0) -&gt; true</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs49', 270)" onmouseover="showTip(event, 'fs49', 270)" class="f">retn</span> <span onmouseout="hideTip(event, 'fs78', 271)" onmouseover="showTip(event, 'fs78', 271)" class="i">x</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs76', 272)" onmouseover="showTip(event, 'fs76', 272)" class="f">f</span>  <span class="o">=</span>  <span onmouseout="hideTip(event, 'fs76', 273)" onmouseover="showTip(event, 'fs76', 273)" class="f">f</span> <span onmouseout="hideTip(event, 'fs78', 274)" onmouseover="showTip(event, 'fs78', 274)" class="i">x</span>  <span class="c">// (Some 10.0) = (Some 10.0) -&gt; true</span>
 </code></pre></td>
 </tr>
 </table>
@@ -622,7 +639,7 @@ It is the same as directly passing the value to a function.</p>
 <p>Binding a boxed value and returning it, is the same as the boxed value</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs80', 272)" onmouseover="showTip(event, 'fs80', 272)" class="i">m</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs49', 273)" onmouseover="showTip(event, 'fs49', 273)" class="f">retn</span>  <span class="o">=</span>  <span onmouseout="hideTip(event, 'fs80', 274)" onmouseover="showTip(event, 'fs80', 274)" class="i">m</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span onmouseout="hideTip(event, 'fs79', 275)" onmouseover="showTip(event, 'fs79', 275)" class="i">m</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs49', 276)" onmouseover="showTip(event, 'fs49', 276)" class="f">retn</span>  <span class="o">=</span>  <span onmouseout="hideTip(event, 'fs79', 277)" onmouseover="showTip(event, 'fs79', 277)" class="i">m</span>
 </code></pre></td>
 </tr>
 </table>
@@ -635,10 +652,10 @@ function.</p>
 <span class="l">3: </span>
 <span class="l">4: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs81', 275)" onmouseover="showTip(event, 'fs81', 275)" class="i">ax</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs80', 276)" onmouseover="showTip(event, 'fs80', 276)" class="i">m</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs77', 277)" onmouseover="showTip(event, 'fs77', 277)" class="f">f</span>) <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs78', 278)" onmouseover="showTip(event, 'fs78', 278)" class="f">g</span>   <span class="c">// Calling f with m then pass result to g</span>
-<span class="k">let</span> <span onmouseout="hideTip(event, 'fs82', 279)" onmouseover="showTip(event, 'fs82', 279)" class="i">ay</span> <span class="o">=</span>  <span onmouseout="hideTip(event, 'fs80', 280)" onmouseover="showTip(event, 'fs80', 280)" class="i">m</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span onmouseout="hideTip(event, 'fs77', 281)" onmouseover="showTip(event, 'fs77', 281)" class="f">f</span> <span class="o">&gt;</span><span class="o">=&gt;</span> <span onmouseout="hideTip(event, 'fs78', 282)" onmouseover="showTip(event, 'fs78', 282)" class="f">g</span>)  <span class="c">// Compose f and g first, then pass it m</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="k">let</span> <span onmouseout="hideTip(event, 'fs80', 278)" onmouseover="showTip(event, 'fs80', 278)" class="i">ax</span> <span class="o">=</span> (<span onmouseout="hideTip(event, 'fs79', 279)" onmouseover="showTip(event, 'fs79', 279)" class="i">m</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs76', 280)" onmouseover="showTip(event, 'fs76', 280)" class="f">f</span>) <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> <span onmouseout="hideTip(event, 'fs77', 281)" onmouseover="showTip(event, 'fs77', 281)" class="f">g</span>   <span class="c">// Calling f with m then pass result to g</span>
+<span class="k">let</span> <span onmouseout="hideTip(event, 'fs81', 282)" onmouseover="showTip(event, 'fs81', 282)" class="i">ay</span> <span class="o">=</span>  <span onmouseout="hideTip(event, 'fs79', 283)" onmouseover="showTip(event, 'fs79', 283)" class="i">m</span> <span class="o">&gt;</span><span class="o">&gt;</span><span class="o">=</span> (<span onmouseout="hideTip(event, 'fs76', 284)" onmouseover="showTip(event, 'fs76', 284)" class="f">f</span> <span class="o">&gt;</span><span class="o">=&gt;</span> <span onmouseout="hideTip(event, 'fs77', 285)" onmouseover="showTip(event, 'fs77', 285)" class="f">g</span>)  <span class="c">// Compose f and g first, then pass it m</span>
 
-<span onmouseout="hideTip(event, 'fs81', 283)" onmouseover="showTip(event, 'fs81', 283)" class="i">ax</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs82', 284)" onmouseover="showTip(event, 'fs82', 284)" class="i">ay</span> <span class="c">// Must be the same</span>
+<span onmouseout="hideTip(event, 'fs80', 286)" onmouseover="showTip(event, 'fs80', 286)" class="i">ax</span> <span class="o">=</span> <span onmouseout="hideTip(event, 'fs81', 287)" onmouseover="showTip(event, 'fs81', 287)" class="i">ay</span> <span class="c">// Must be the same</span>
 </code></pre></td>
 </tr>
 </table>
@@ -672,7 +689,7 @@ function that also is a boxed value. In this way we can turn every argument of a
 to a boxed value. A function like <code>int -&gt; string -&gt; float -&gt; int</code> can thus be turned into</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
-<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">M</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs83', 285)" onmouseover="showTip(event, 'fs83', 285)" class="i">int</span><span class="o">&gt;</span> <span class="k">-&gt;</span> <span class="i">M</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs10', 286)" onmouseover="showTip(event, 'fs10', 286)" class="i">string</span><span class="o">&gt;</span> <span class="k">-&gt;</span> <span class="i">M</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs12', 287)" onmouseover="showTip(event, 'fs12', 287)" class="i">float</span><span class="o">&gt;</span> <span class="k">-&gt;</span> <span class="i">M</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs83', 288)" onmouseover="showTip(event, 'fs83', 288)" class="i">int</span><span class="o">&gt;</span>
+<td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">M</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs82', 288)" onmouseover="showTip(event, 'fs82', 288)" class="i">int</span><span class="o">&gt;</span> <span class="k">-&gt;</span> <span class="i">M</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs10', 289)" onmouseover="showTip(event, 'fs10', 289)" class="i">string</span><span class="o">&gt;</span> <span class="k">-&gt;</span> <span class="i">M</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs12', 290)" onmouseover="showTip(event, 'fs12', 290)" class="i">float</span><span class="o">&gt;</span> <span class="k">-&gt;</span> <span class="i">M</span><span class="o">&lt;</span><span onmouseout="hideTip(event, 'fs82', 291)" onmouseover="showTip(event, 'fs82', 291)" class="i">int</span><span class="o">&gt;</span>
 </code></pre></td>
 </tr>
 </table>
@@ -692,9 +709,10 @@ to a boxed value. A function like <code>int -&gt; string -&gt; float -&gt; int</
 </tr>
 </table>
 <p>Interpreted as a one-argument function, we can upgrade a function like <code>map</code>. The difference is
-that we only upgrade the input, because the function we have already returns a boxed value.</p>
+that we only upgrade the input, because the function we have already return a boxed value.</p>
 <p>Interpreted as a two-argument function, we see it as a form of Continuation passing style. We
-often use piping with "|&gt;" to get the value to the <em>left-side</em>.</p>
+often use piping with <code>|&gt;</code> to get the value to the <em>left-side</em> and the continuation function on
+the <em>right-side</em>.</p>
 <table class="pre"><tr><td class="lines"><pre class="fssnip"><span class="l">1: </span>
 </pre></td>
 <td class="snippet"><pre class="fssnip highlighted"><code lang="fsharp"><span class="i">m</span> <span class="o">|&gt;</span> <span class="i">M</span><span class="o">.</span><span class="i">bind</span> <span class="i">f</span>
@@ -708,7 +726,7 @@ often use piping with "|&gt;" to get the value to the <em>left-side</em>.</p>
 </code></pre></td>
 </tr>
 </table>
-<p>This way we have boxed values <code>M&lt;'a&gt;</code>, but our function <code>f</code> only get an unboxed <code>'a</code>. In this way
+<p>This way we have a boxed value <code>M&lt;'a&gt;</code>, but our function <code>f</code> only receives an unboxed <code>'a</code>. In this way
 we can work with unboxed values and also use any function without explicitly box them. Because
 we must return <em>boxed</em> values we usually use <code>return</code> to return/box an unboxed value inside of <code>f</code>.</p>
 <p>The syntax of this kind of continuation-passing style can be improved with a <em>Computation Expression</em>.</p>
@@ -791,16 +809,15 @@ we must return <em>boxed</em> values we usually use <code>return</code> to retur
 <div class="tip" id="fs68">val cubeVolume2 : float option<br /><br />Full name: Main.cubeVolume2</div>
 <div class="tip" id="fs69">val vol : float</div>
 <div class="tip" id="fs70">val map : f:(&#39;a -&gt; &#39;b) -&gt; opt:&#39;a option -&gt; &#39;b option<br /><br />Full name: Main.map</div>
-<div class="tip" id="fs71">val o : &#39;a</div>
-<div class="tip" id="fs72">val apply : fo:(&#39;a -&gt; &#39;b) option -&gt; xo:&#39;a option -&gt; &#39;b option<br /><br />Full name: Main.apply</div>
-<div class="tip" id="fs73">val fo : (&#39;a -&gt; &#39;b) option</div>
-<div class="tip" id="fs74">val xo : &#39;a option</div>
-<div class="tip" id="fs75">val g : (&#39;b -&gt; &#39;c)</div>
-<div class="tip" id="fs76">val g : (&#39;b -&gt; &#39;c option)</div>
-<div class="tip" id="fs77">val f : arg00:string -&gt; float option<br /><br />Full name: Main.f</div>
-<div class="tip" id="fs78">val g : x:float -&gt; float option<br /><br />Full name: Main.g</div>
-<div class="tip" id="fs79">val x : string<br /><br />Full name: Main.x</div>
-<div class="tip" id="fs80">val m : string option<br /><br />Full name: Main.m</div>
-<div class="tip" id="fs81">val ax : float option<br /><br />Full name: Main.ax</div>
-<div class="tip" id="fs82">val ay : float option<br /><br />Full name: Main.ay</div>
-<div class="tip" id="fs83">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.int<br /><br />--------------------<br />type int = int32<br /><br />Full name: Microsoft.FSharp.Core.int<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int<br /><br />Full name: Microsoft.FSharp.Core.int&lt;_&gt;</div>
+<div class="tip" id="fs71">val apply : fo:(&#39;a -&gt; &#39;b) option -&gt; xo:&#39;a option -&gt; &#39;b option<br /><br />Full name: Main.apply</div>
+<div class="tip" id="fs72">val fo : (&#39;a -&gt; &#39;b) option</div>
+<div class="tip" id="fs73">val xo : &#39;a option</div>
+<div class="tip" id="fs74">val g : (&#39;b -&gt; &#39;c)</div>
+<div class="tip" id="fs75">val g : (&#39;b -&gt; &#39;c option)</div>
+<div class="tip" id="fs76">val f : arg00:string -&gt; float option<br /><br />Full name: Main.f</div>
+<div class="tip" id="fs77">val g : x:float -&gt; float option<br /><br />Full name: Main.g</div>
+<div class="tip" id="fs78">val x : string<br /><br />Full name: Main.x</div>
+<div class="tip" id="fs79">val m : string option<br /><br />Full name: Main.m</div>
+<div class="tip" id="fs80">val ax : float option<br /><br />Full name: Main.ax</div>
+<div class="tip" id="fs81">val ay : float option<br /><br />Full name: Main.ay</div>
+<div class="tip" id="fs82">Multiple items<br />val int : value:&#39;T -&gt; int (requires member op_Explicit)<br /><br />Full name: Microsoft.FSharp.Core.Operators.int<br /><br />--------------------<br />type int = int32<br /><br />Full name: Microsoft.FSharp.Core.int<br /><br />--------------------<br />type int&lt;&#39;Measure&gt; = int<br /><br />Full name: Microsoft.FSharp.Core.int&lt;_&gt;</div>

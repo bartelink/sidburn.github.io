@@ -10,20 +10,19 @@ module Main
 open System
 
 (**
-In [Understanding map]({% post_url 2016-03-27-understanding-map %}) we learned about the "map"
-function and that implementing those is what we call a *Functor*. In 
-[Applicative Functors]({% post_url 2016-03-31-applicative-functors %}) we extended that idea
-with the `return` and `apply` function. The next important function in our toolset is
+In [Understanding map]({% post_url 2016-03-27-understanding-map %}) we learned that implementing 
+a `map` function is what we call a *Functor*. In [Applicative Functors]({% post_url 2016-03-31-applicative-functors %})
+we extended that idea with the `return` and `apply` function. The next important function in our toolset is
 the `bind` function.
 
 ## Monads
 
 The combination of `return` and `bind` is what we call a Monad. But currently
-i will not consider this as an introduction to Monads at all. If you heard the *Monad* term and
+I will not consider this as an introduction to Monads at all. If you heard the *Monad* term and
 search for an introduction to understand what a *Monad* is you will not find an answer her. If
 you already have some basic understanding about the term than this and my two previous blogs
 can help to understand the concept. Otherwise if you just try to understand what a *Monad* is
-i recommend the following link to understand the problem:
+I recommend the following link to understand the problem:
 [The what are Monads Fallacy](http://two-wrongs.com/the-what-are-monads-fallacy)
 
 ## The Problem
@@ -34,13 +33,12 @@ one argument, with `return` and `apply` we could upgrade functions with multiple
 what is `bind` supposed to do?
 
 Up to this point we only upgraded functions that had normal unboxed input and output types. We always
-faced functions like `int -> int`, but never functions like `int -> option<int>`, `int -> Async<int>`
-or `int -> list<int>`. But in practice, functions that take some normal input, and produces
-a `option`, `list` or `Async` are quite common. 
+faced functions like `'a -> 'b`, but never functions like `'a -> option<'b>`, `'a -> Async<'b>`
+or `'a -> list<'b>`. But in practice, the latter are quite common. 
 
-A simple example to demonstrate this is just parsing the input (string) to a `float`. Because parsing
-could fail (string is not a `float`) it will return an `option<float>` instead. Usually we create a
-`Double` extension for this.
+A simple example is a function that tries to parse a `string` to a `float`. Because parsing of
+a string to a float could fail we usually expect a return type like `option<float>`. Usually we
+create a `Double` extension for this.
 *)
 
 // Note: .NET System.Double is "float"   in F# and "double" in C#.
@@ -65,14 +63,14 @@ let's assume we have a `option<string>`, and now we want to pass this value to `
 As `tryParse` only expects `string` we could `Option.map` `tryParse` so it could work with
 a `option<string>`.
 
-But `map` not only adds a `option` *layer* to the input, it also adds it to the output. Now
-we have a function with the signature.
+But `map` not only adds a `option` *layer* to the input, it also adds it to the output. When we
+use `Option.map` on our `Double.tryParse` function, we get a function that looks like this:
 
     option<string> -> option<option<float>>
 
-So we have the problem that our *output* is wrapped two times in the same layer. Now we have a
+The problem is that our *output* is wrapped two times in the same layer. Now we have a
 *option containing an option containing a float*. But what we really want is just an `option<float>`.
-And here comes `bind` into the play. The purpose of `bind` is to only *upgrade* the input of a
+This is where `bind` comes into the play. The purpose of `bind` is to only *upgrade* the input of a
 function because the output of a function already returns an upgraded type. A `bind` function thus
 always have the *type-signature*
 
@@ -83,7 +81,7 @@ always have the *type-signature*
 ## `return` once again
 
 The `bind` function don't stands on it's own. We also need a `return` function. But we
-already covered this function in [Applicative Functors]({% post_url 2016-03-31-applicative-functors %})
+already covered this function in [Applicative Functors]({% post_url 2016-03-31-applicative-functors %}).
 
 ## Implementing `bind`
 
@@ -123,8 +121,8 @@ an `option`. So we just return it's output directly.
 
 ### The `join` way
 
-In the second way we first create a new function that can turn a `option<option<'a>>` just into a
-`option<'a>`. That's also quite easy. We first check our first outer-most `option`. If it is `None`
+The other way is to first implement a new function that can turn a `option<option<'a>>` just into a
+`option<'a>`. That's also quite easy. We first check our outer-most `option`. If it is `None`
 we just return `None`. In the `Some` case we have another option that we directly return.
 *)
 
@@ -153,7 +151,7 @@ let input3 = Some "200"   |> mapOption   Double.tryParse  // Some (Some 200.0)
 As we can see from the signature. `input1` and `input2` are just `option<float>`
 instead of `option<option<float>>` that a `map` will return us.
 
-Sure, the `Option` module already contains `Option.map` and `Option.bind`, so we don't have to
+The `Option` module already contains `Option.map` and `Option.bind`, so we don't have to
 rewrite those ourselves. As another exercise, let's look at a `bind` implementation for `list`.
 
 ## `bind` for `list`
@@ -172,13 +170,19 @@ let mapList f inputList =
 this is not possible. Because in a list we call `f` multiple times for the input list, and the output
 of those are collected into a new list.
 
-because we think of `f` as a *Monadic function*. It means `f` returns a `list`. So what we overall get
-back is a list of list `list<list<'a>>`. Solving that problem inside of `bind` is hard, because `list`
-is an *immutable* data-structure. With a *mutable* list (`ResizeArray`) this operation would be quite
-easy, as we just could call `f x` that returns a `list` and loop through it and add it to some other list
-at the end that accumulates all. If you really want to solve it in `bind` in one-go that is
-even what i would. Otherwise you have to use two nested `fold` or `foldBack` calls. So instead of
-nesting them. It is usually better to extract those operation into it's own function. So we create
+Because `f` is a *Monadic function* in `bind` it means every call to `f` will return a list. If
+we add a list to another list, we get a list of list as expected `list<list<'a>>`. If we try to
+return a single `list` instead, it means we have to loop over the result of `f` and add its element
+to another list.
+
+Solving that problem inside of `bind` is hard, because `list` is an *immutable* data-structure. With a
+*mutable* list (`ResizeArray`) this operation would be quite easy, as we just could call `f x` that
+returns a `list` and loop through it and add it to some other list, but with an *immutable* list we
+cannot just add elements to an existing element.
+
+When we really want to solve it in one-go we could use a mutable list like `ResizeArray`, otherwise
+we have to use two nested `fold` or `foldBack` calls. Instead of nesting it and turning it in a complex
+function it is usually better to just extract those operation into it's own function. So we create
 a `concat` operation first, that can turn a `list<list<'a>>` just into a single list.
 
 I'm not showing how to implementing `concat` for `list`, as the focus is `bind` not how immutable list
@@ -197,7 +201,7 @@ F# also provides an implementation for this function. But it is named `List.coll
 ## An operator for `bind`
 
 In [Applicative Functors]({% post_url 2016-03-31-applicative-functors %}) we used `<!>` for the `map` function.
-And `<*>` for the `apply` function. We use `>>=` as an operator for the `bind` operation. But on top of it.
+And `<*>` for the `apply` function. We use `>>=` as an operator for the `bind` function. But on top of it.
 If we write it as an operator we swap the arguments. We expects our type `option`, `list`, `async` on the
 left-side and the function on the right-side.
 *)
@@ -214,23 +218,36 @@ and `apply` by the idea to just pass in the first argument. So when we have
 
     ('a -> option<'b>) -> option<'a> -> option<'b>
 
-we see it as a function that just *upgrades* the input function. But sure, we still have a two argument
-function here, and the two argument form is really how it is most often used. If we threat it as
+we see it as a function that just *upgrades* the input of a function. But we still have a two argument
+function here, and the two argument form is how `bind` is used most often. If we threat it as
 a two-argument function we have something like this:
 
 We have a `option<'a>` as an input. And we provide a function `'a -> option<'b>`. As we can see, the input
 of `f` is just `'a`. So what we get as the input is the **unwrapped** `'a` that is inside `option<'a>`.
-So we can provide a function `f` that only will be executed when our `option<'a>` is `Some value`.
 
+It can help here if we think with piping `|>`. The idea of piping is that we can write the next argument
+of a function on the left side. So instead of `f x` we also can write `x |> f`. When we use `bind` with
+piping we have something like `x |> Option.bind f`. We also can rearange the *type-signature* to reflect
+this style of writing
+
+    option<'a> -> ('a -> option<'b>) -> option<'b>
+
+When we use piping with bind, we get something similar to the above. And probably the order becomes
+clearer. We start with a boxed value like `option<'a>`, then our `bind` function somehow extract the
+`'a` from our `option<'a>`, this `'a` is then passed to the function `('a -> option<'b>)`. This function
+returns an `option<'b>` what is also what `bind` will then return!
+
+But it is important to understand that there is no guarantee that our function will be called at all!
 Look again at the implementation of `bind` to understand this. `bind` checks whether we have `None` or `Some`.
-In the `None` case it will just return `None` but in the `Some` case it will do `f x`. So only in the `Some`
-case our passed in function `f` will be executed! Not only that, the *unwrapping* of the `option`
-is already handled for us by the `bind` function. So we can pass a function `f` to bind that only will
-be executed if we have `Some value`.
+In the `None` case it will just return `None` only in the `Some` case it will call `f x` and execute
+our function that we passed to `bind`!
 
-To understand this idea in more depth. Let's first create a function that prints some text to screen.
-And we expect that the user enters some number. We parse the input as `float` with our
-`Double.tryParse` function. This returns an `option<float>`
+Not only that, the *unwrapping* of the `option` is already handled for us by the `bind` function. So we
+can pass a function `f` to `bind` that only will be executed if we have `Some value`.
+
+Let's create an example to understand this idea in more depth. At first we create a function that
+prints some text to screen and expect the user to enter a float. We try to parse the input as
+`float` with our `Double.tryParse` function that returns an `option<float>`.
 *)
 
 let getUserInput msg =
@@ -249,10 +266,11 @@ functions. We just could `map` or `apply` all other functions that are not compa
 
 But instead of doing that, let's pass the resulting `option<float>` directly to `bind`. We then
 provide a continuation function to `bind` that only will be executed if we have `Some value`.
-The advantage is that our `f` function now only sees a `float`, not a `option<float>`. We now
-can do with that `float` whatever we want. Let's for example assume we want to fetch the User
-input, and we see that number as the radius of a circle, and we want to calculate the are of that
-circle.
+The advantage is that our `f` function only sees a `float`, not a `option<float>`. We now
+can do something with that `float`. 
+
+Let's write an example where the user inputs the radius of a circle, and we calculate the
+area of that circle.
 *)
 
 let retn x = Some x
@@ -267,8 +285,9 @@ let area =
 (**
 Let's go through the example step-by-step.
 
-1. At first we just create a function `circleArea` that does are computation. We just expect `float`
-   as it's input. Sure we usually don't want to handle `option<float>`, `list<float>` and so on.
+1. At first we just create a function `circleArea` that calculates the area from a given radius.
+   For such a function we just expect `float` as input. We usually don't expect `option<float>`
+   or `list<float>` as the input.
 1. Then we call `getUserInput "Enter radius"`. The user will see "Enter radius: " and he must enter
    something. The input will be parsed as a `float`. We will either get `Some x` back if
    the user input was a `float` or `None` if the input was not valid.
@@ -287,12 +306,12 @@ Let's go through the example step-by-step.
    now we want to return `area` as the result of our calculation. But `bind` must return
    an `option` value. So how do we do that? We use our `retn` (return) function to convert
    a normal `float` into an `option<float>`
-1. Our outer `area` is now a "option<float>" that either is `Some` and contains the calculated area
+1. Our outer `area` is now a `option<float>` that either is `Some` and contains the calculated area
    for a circle. Or it is `None`, because the user input could not be parsed.
 
-Currently we don't print the result. So let's print "area". As the outer "area" (outside of the
+Currently we don't print the result. So let's print `area`. As `area` (outside of the
 continuation function) is now a `option<float>` we have to Pattern Match it to see if our computation
-was successful (userInput was a valid `float`) or not.
+was successful or not.
 *)
 
 match area with
@@ -301,8 +320,8 @@ match area with
 
 (**
 If the user input was `10` for example, we will see `The area of a circle is 314.159265`, but if we provide
-an invalid input, we just see `User Input was not a valid number`. In our example we first have some 
-`option` value and we pass it to `Option.bind` with `|>`. This happens often, that is why we created
+an invalid input, we just see `User Input was not a valid number`. In our example we first had a  
+`option` value and passed it to `Option.bind` with `|>`. This happens often, that is why we created
 `>>=` previously.
 
 Let's extend that example. We now ask the user for three inputs. And we will calculate the volume
@@ -322,23 +341,23 @@ match cubeVolume with
 | Some volume -> printfn "Volume of cube is: %f" volume
 
 (**
-As we now can see. We ask the user three times for a number for X, Y and Z. If all inputs were valid. We
+As we can see now. We ask the user three times to input a number X, Y and Z. If all inputs were valid. We
 just calculate the volume with `let volume = x * y * z`. The important aspect is that all of our values
 are always `float` never `option<float>`, because the `bind` operation `>>=` already did the
 unwrapping for us.
 
 And probably it now becomes clear why we named our *constructor* `return` (retn). Inside of our
-continuations functions we never have lifted values. But at the end of our continuation functions we
+continuation functions we never have lifted values. But at the end of our continuation functions we
 always must return a lifted value. So *lifting* and *returning* is always the last statement we do.
 
-Let's inspect the syntax a little bit deeper. Look at the syntax of a normal "let"
+Let's inspect the syntax a little bit deeper. Look at the syntax of a normal `let`
 definition in F#. Usually a `let` definition contains a name, a equal "=" and a expression that
 will be executed. Actually just look at the following two lines and just compare them.
 
     let x = getUserInput "Length X"
     getUserInput "Length X" >>= (fun x ->
 
-So, do you spot the similarities?
+Do you spot the similarities?
 
 1. Both definition have an expression `getUserInput "Length X"` this expression will be executed.
 1. In the first example: We only have `=` for assignment, and we assign the result to `let x`.
@@ -433,8 +452,8 @@ let map f opt =
 
 // map defined with Computation Expression
 let map f opt = maybe {
-    let! o = opt  // unbox option
-    return f o    // execute (f x) and box result
+    let! x = opt  // unbox option
+    return f x    // execute (f x) and box result
 }
 
 // Apply with bind operator
@@ -468,7 +487,7 @@ as they don't have matching input/output.
     'a -> option<'b>
     'b -> option<'c>
 
-This functions cannot be composed because `option<'b>` is not the same as `'b`. But with our
+These functions cannot be composed because `option<'b>` is not the same as `'b`. But with our
 bind operator `>>=` we can easily pass boxed values into function that don't expect them. Because
 of that we also can create a compose function that directly compose two *Monadic functions*.
 We use the operator `>=>` for this kind of composition. This kind of composition is also named
@@ -491,13 +510,13 @@ the result is a new *Monadic function*.
 ## Laws
 
 We already saw Laws for *Functors* and *Applicative Functors*. The combination of `return`
-and `bind` (a Monad) also must satisfy three laws. in the following description I use
+and `bind` (a Monad) also must satisfy three laws. In the following description I use
 *)
 
 let f   = Double.tryParse // string -> option<float>
-let g x = retn (x * 2.0)  // float -> option<float>
+let g x = retn (x * 2.0)  // float  -> option<float>
 let x   = "10"            // string         -- unboxed value
-let m   = retn "10"      // option<string> -- a boxed value
+let m   = retn "10"       // option<string> -- a boxed value
 
 (**
 But sure, all laws have to work with any function or value combination. But seeing some actual
@@ -574,10 +593,11 @@ It just boxes a `'a`
     ('a -> M<'b>) -> M<'a> -> M<'b>
 
 Interpreted as a one-argument function, we can upgrade a function like `map`. The difference is
-that we only upgrade the input, because the function we have already returns a boxed value.
+that we only upgrade the input, because the function we have already return a boxed value.
 
 Interpreted as a two-argument function, we see it as a form of Continuation passing style. We
-often use piping with "|>" to get the value to the *left-side*.
+often use piping with `|>` to get the value to the *left-side* and the continuation function on
+the *right-side*.
 
     m |> M.bind f
 
@@ -585,7 +605,7 @@ On top, we give `|> M.bind` it's own operator `>>=`
 
     m >>= f
 
-This way we have boxed values `M<'a>`, but our function `f` only get an unboxed `'a`. In this way
+This way we have a boxed value `M<'a>`, but our function `f` only receives an unboxed `'a`. In this way
 we can work with unboxed values and also use any function without explicitly box them. Because
 we must return *boxed* values we usually use `return` to return/box an unboxed value inside of `f`.
 
