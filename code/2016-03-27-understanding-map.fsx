@@ -48,7 +48,7 @@ Before we look at `map`, let's create some simple functions. These functions wil
 *)
 
 // Squares a number: int -> int
-let square x = x * 2
+let square x = x * x
 
 // Add 10 to every number: int -> int
 let add10 x = x + 10
@@ -82,9 +82,9 @@ a new `list<int>`. Our `squareList` function basically does the same thing as `s
 
 A final note is the `List.rev` at the end, if it is unclear why we need it. `x :: xs` creates a new list,
 but it `prepends` elements. We actually cannot add elements to the end. So when we loop over a list like
-`[1;2;3;4;5]` we will first `square` 1 and add it to an empty list resulting in `[2]`. Then we `square`
-2 and the result is added to `[2]` yielding in `[4;2]`. That's why we have to reverse the list at the
-end when we are done!
+`[1;2;3;4;5]` we will first `square` 1 and add it to an empty list resulting in `[1]`. Then we `square`
+2 and the result is added to `[1]` yielding in `[4;1]` and so on. That's why we have to reverse the list
+at the end when we are done!
 
 Some time later we are faced with the problem that we also want to use our `add10` function on a `list`
 so we also write a new function for this.
@@ -112,15 +112,15 @@ is different will be expected as an argument. So what we finally end up with, is
 let mapList f xs =
     let mutable result = []
     for x in xs do
-        let squared = f x
-        result <- squared :: result
-    List.rev xs
+        let mapping = f x
+        result <- mapping :: result
+    List.rev result
 
 (**
 We now can use `mapList` like this.
 *)
 
-let listOfsquared = mapList square [1;2;3] // [2;4;6]
+let listOfsquared = mapList square [1;2;3] // [1;4;9]
 let listOfAdd10   = mapList add10  [1;2;3] // [11;12;13]
 
 (**
@@ -177,7 +177,7 @@ let mapOption f opt =
 We now can use `mapOption` like this.
 *)
 
-let OptionSquare1 = mapOption square (Some 5) // Some 10
+let OptionSquare1 = mapOption square (Some 5) // Some 25
 let OptionSquare2 = mapOption square None     // None
 let OptionAdd10_1 = mapOption add10  (Some 5) // Some 15
 let OptionAdd10_2 = mapOption add10  None     // None
@@ -381,7 +381,7 @@ We can now do
 let data = Async.RunSynchronously (squaring downloadPage)
 
 (**
-And `data` will be `[Some 2; Some 4; None; Some 6; None; None; Some 20]`
+And `data` will be `[Some 1; Some 4; None; Some 9; None; None; Some 100]`
 
 All `Option`, `List` and `Async` handling was handled for us. We just **upgraded**
 `square` with the different `map` functions until it matches our needed signature.
@@ -408,7 +408,7 @@ Whenever we have a type with a `map` function we call it a *Functor* if the impl
 of `map` satisfies two laws. Those two laws ensures that `map` is predictable and don't do
 additional stuff we didn't expect.
 
-### 1. Rule: Mapping `id`
+### 1. Law: Mapping `id`
 
 The first rule says that mapping over the `id` function must not change the input. The `id`
 function is just a function that returns its input as-is
@@ -423,7 +423,7 @@ let xs = List.map id [1;2;3;4;5]
 (**
 Then `xs` still must be `[1;2;3;4;5]`.
 
-### 2. Rule: Function composition
+### 2. Law: Function composition
 
 The second rule says that composing two functions and then mapping, should be the same
 as mapping over both functions separately.
@@ -442,7 +442,7 @@ let sxs =
 (**
 It shouldn't matter if we go through the list take one element and then do `square` and `add10`
 in one-step. Or if we go trough our list two times and do it in two separately steps. Both
-`cxs` and `sxs` have to return the same result `[12;14;16;18;20]`
+`cxs` and `sxs` have to return the same result `[11;14;19;26;35]`
 
 Because `List.map` satisfies both laws, we say that `List` is a *functor*.
 
