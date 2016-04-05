@@ -73,7 +73,7 @@ let squareList xs =
     for x in xs do
         let res = square x
         results <- res :: results
-    List.rev xs
+    List.rev results
 
 (**
 So what we now have is a `squareList` function, this function now takes a `list<int>` as input and returns
@@ -91,11 +91,11 @@ so we also write a new function for this.
 *)
 
 let add10List xs =
-    let mutable result = []
+    let mutable results = []
     for x in xs do
         let res = add10 x
-        result <- res :: result
-    List.rev xs
+        results <- res :: results
+    List.rev results
 
 (**
 Besides that the code is anyway not really nice or functional to begin with, the big problem is that we basically
@@ -110,11 +110,11 @@ is different will be expected as an argument. So what we finally end up with, is
 *)
 
 let mapList f xs =
-    let mutable result = []
+    let mutable results = []
     for x in xs do
         let mapping = f x
-        result <- mapping :: result
-    List.rev result
+        results <- mapping :: results
+    List.rev results
 
 (**
 We now can use `mapList` like this.
@@ -438,6 +438,8 @@ let sxs =
     [1;2;3;4;5]
     |> List.map square
     |> List.map add10
+
+cxs = sxs // must be the same
 
 (**
 It shouldn't matter if we go through the list take one element and then do `square` and `add10`
