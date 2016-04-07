@@ -184,12 +184,12 @@ to provide `stop` and `f` again as arguments. We can fix this problem by just cr
 `loop` function inside `forLoop` instead.
 *)
 
-let forLoop i stop f =
+let forLoop start stop f =
     let rec loop i =
         if i < stop then
             f i
             loop (i+1)
-    loop i
+    loop start
 
 forLoop 0 10 (fun i -> printfn "%d" i)
 
@@ -209,6 +209,9 @@ This has several advantages:
 1.  Sometimes we just want to provide a fixed starting value. For example in a `sum` function
     we provide `0` as the starting value. We don't want that the user must enter `0` as a
     starting value for the recursion call!
+1.  Different names for arguments. For example our `forLoop` now has `start` instead of `i`. But
+    it doesn't make sense to use `start` inside of `loop`. Clearer names can help in understanding
+    code. But it also helps users of `forEach`. As they now see `start` as an argument, not `i`.
 
 The only problem so far is that we only can call functions that do some sort of side-effect.
 But we cannot for example create something new out of the looping. For example if we want to
@@ -228,7 +231,7 @@ pass `sum` as an argument to our `f` function. As we cannot *mutate* `sum` insid
 `f` returns the new `sum` that we then use for the next *recursive call*.
 *)
 
-let forLoop i stop f =
+let forLoop start stop f =
     let rec loop i sum =
         if i < stop then 
             // create the next sum
@@ -238,7 +241,7 @@ let forLoop i stop f =
         else
             // Return "sum" as soon we reach stop
             sum
-    loop i 0
+    loop start 0
 
 let sum = forLoop 0 10 (fun i sum -> sum + i) // 45
 
@@ -246,39 +249,39 @@ let sum = forLoop 0 10 (fun i sum -> sum + i) // 45
 The only thing I dislike at this point is that the usage of our `forLoop` is still limited. We have
 the signature.
 
-    i:int -> stop:int -> f:(int -> int -> int) -> int
+    start:int -> stop:int -> f:(int -> int -> int) -> int
 
-It makes sense that `i` and `stop` are `int`. But usually we expect that the *looping-body* (`f`)
+It makes sense that `start` and `stop` are `int`. But usually we expect that the *looping-body* (`f`)
 can work with any type. Or in other words, that `sum` can be of any type. And that a `forLoop`
 also can return any type. But currently we are limited to `int`.
 
-It is an `int` because we call `loop i 0` and directly pass `0` (an `int`) as `sum`.
+It is an `int` because we call `loop start 0` and directly pass `0` (an `int`) as `sum`.
 It makes more sense that the user can provide the *initial-value*. And `f` just returns a new value
 of the same type. This way, the *initial-value* can be generic.
 *)
 
-let rec forLoop i stop init f =
+let rec forLoop start stop init f =
     let rec loop i acc =
         if i < stop then 
             let nextAcc = f i acc
             loop (i+1) nextAcc
         else
             acc
-    loop i init
+    loop start init
 
 let sum = forLoop 0 10 0 (fun i sum -> sum + i) // 45
 
 (**
 We now have the signature:
 
-    i:int -> stop:int -> init:'a -> f:(int -> 'a -> 'a) -> 'a
+    start:int -> stop:int -> init:'a -> f:(int -> 'a -> 'a) -> 'a
 
 We now created a `forLoop` just with recursion and without any *mutable variable*. Our loop supports
 the creation of any value. The function `f` just returns the next state (`acc`) that is used for
-the next *iteration/recursion* and we don't contain any *mutable variable*.
+the next *iteration/recursion* and we don't need any *mutable variable* anymore.
 
-Now we are not limited to `int` any more. Our `forLoop` can create any type. We could for example
-build another list from it in an *immutable* way.
+We now can create any type not just `int`. We could for example build another list from it in
+an *immutable* way.
 *)
 
 let listOfNumbers = forLoop 0 10 [] (fun i list -> i :: list)
